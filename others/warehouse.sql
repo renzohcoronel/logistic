@@ -1,0 +1,10 @@
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (1,'Buenos Aires',200,'WH01',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (2,'Rosario',70,'WH02',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (3,'Córdoba',150,'WH03',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (4,'Trelew',140,'WH04',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (5,'Mendoza',150,'WH05',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (6,'La Plata',100,'WH06',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (7,'San Miguel de Tucumán',120,'WH07',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (8,'Mar del Plata',180,'WH08',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (9,'Salta',140,'WH09',false);
+INSERT INTO wharehouse (id,city,max_limit,name,isDelayedAllow) VALUES (10,'Santa Fe',70,'WH10',false);

@@ -1,0 +1,30 @@
+@startuml
+title Logistic model
+left to right direction
+
+class Package {
+    customer: Customer
+    from: String
+    to: String
+}
+
+class Warehouse {
+    name:String
+    city: String
+    max_limit: Number
+    isDelayedAllow: Boolean
+}
+
+class Customer {
+
+    name: String 
+    surname: String 
+    adress: String 
+    phone: String 
+    email: String 
+}
+
+Package "1" --> "1" Customer
+Warehouse "1" *--> "0.. *" Package
+
+@enduml
