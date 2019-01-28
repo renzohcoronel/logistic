@@ -28,6 +28,11 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+
+## Model
+
+![alternative text](http://www.plantuml.com/plantuml/png/PP0zImGn48Rx_8fXouCxjDr2pezIHB2mb36PsnsSP8vaWXxYVrV3RN2nIlA4lC_atHV3R3MACpOXkDU9Yx67g8742HqCJ27pD1i4pkIDDJdd1Kk1H_HlE15yEW00Nujff3p2xNdNy25h7E79CgUf0TD-_5gIdZ7JhBKiMGaZZN_UUBRJAYJYnujmP1lXeSRNiulB7GcUA5oBwFi8Dwf2cBgdJ_QZwPub5nefDV-763ALicR7MHEj4KLawUZNkZGqN0wmtLwrjRVJFztmfjrVx7Qm6PPcdTjJ2ZNADm00)
+
 ## Installation
 
 ```bash
