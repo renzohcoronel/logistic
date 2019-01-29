@@ -8,7 +8,7 @@ distance.key(process.env.GOOGLE_CLIENT_KEY);
 export class DistanceService {
   constructor() {}
 
-  getDistance(origin: string[], destination: string[]) {
+  async getDistance(origin: string[], destination: string[]) {
     return new Promise<any>(async (resolve, reject) => {
       await distance.matrix(origin, destination, (error, distances) => {
         if (error) {
@@ -16,19 +16,12 @@ export class DistanceService {
           return reject(error);
         }
     
-        console.log(distances);
-        
+        console.log(JSON.stringify(distances));
+       
+
         if (distances.status == 'OK') {
           if (distances.rows[0].elements[0].status == 'OK') {
-            console.log(
-              'Distance from ' +
-                origin +
-                ' to ' +
-                destination +
-                ' is ' +
-                distance,
-            );
-            resolve(distances.rows[0].elements[0].distance.text);
+            resolve(distances.rows[0].elements[0].distance.value);
           }
         } else {
           resolve(0);

@@ -26,8 +26,7 @@ export class Package {
   @Column()
   to: string;
 
-  @OneToOne(type => Customer)
-  @JoinColumn()
+  @ManyToOne(type => Customer, customer => customer.packages)
   customer: Customer;
 
   @ManyToOne(type => Warehouse, warehouse => warehouse.packages)

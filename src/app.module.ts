@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PackagesModule } from 'package/package.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationDTO } from 'pipes/validationDTO.pipe';
+import { Connection } from 'typeorm';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ValidationDTO } from 'pipes/validationDTO.pipe';
       database: process.env.DB_NAME,
       entities: ['src/**/**.entity{.ts,.js}'],
       synchronize: true,
+      logging: true
     })
     ,
     PackagesModule
@@ -29,4 +31,6 @@ import { ValidationDTO } from 'pipes/validationDTO.pipe';
     },
     AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly connection: Connection) {}
+}

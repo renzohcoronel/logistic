@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Package, Status } from 'models/package.entity';
 import { PackageDTO } from 'dtos/package.dto';
 import { WarehouseService } from 'warehouse/warehouse.service';
+import { Customer } from 'models/customer.entity';
 
 
 @Injectable()
@@ -27,15 +28,16 @@ export class PackageService {
     );
     console.log(`[ warehouse selected ] ->  ${warehouse}`);
     let newPackage = this.packageRespository.create();
-    newPackage.customer = packageDto.customer;
     newPackage.from = packageDto.from;
+    newPackage.customer = packageDto.customer;
     newPackage.to = packageDto.to;
     newPackage.warehouse = warehouse? warehouse: null;
     newPackage.status = Status.RECEIVED;
 
     console.log(`[ Package new ] -> `, newPackage);
 
-    newPackage = await this.packageRespository.save(newPackage);
+    newPackage = await this.packageRespository.save(newPackage,{});
+    
 
     packageDto.id = newPackage.id;
     packageDto.status = newPackage.status;

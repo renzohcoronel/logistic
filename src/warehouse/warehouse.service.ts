@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Warehouse } from 'models/warehouse.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistanceService } from './distanceGoogle.service';
-import { resolve } from 'url';
-import { throws } from 'assert';
+import { Warehouse } from '../models/warehouse.entity';
 
 @Injectable()
 export class WarehouseService {
@@ -19,6 +17,7 @@ export class WarehouseService {
 
        
         const warehouses = await this.getWarehouses();
+        console.log("warehouses avaireable", warehouses);
         let warehouseDistances = [];
         
         let warehousePromise = warehouses.map( async warehouse => {
@@ -34,9 +33,13 @@ export class WarehouseService {
 
         await Promise.all(warehousePromise);
 
+
+
         console.log(`[ Warehouses distances ]`);
     
-        let value = warehouseDistances.reduce((a, b) => Math.min(a.distance, b.distance)); 
+        let value = warehouseDistances.reduce((a, b) => Math.min(a.distance, b.distance));
+  
+        
         console.log("MIMIUM VALUE :");
         resolve(value);
   
