@@ -9,7 +9,6 @@ import { IsString, IsInt } from "class-validator";
   
   export class PackageDTO {
 
-    @IsInt()
     id: number;
     customer: CustomerDTO;
     @IsString()

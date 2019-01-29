@@ -1,37 +1,45 @@
-import { Injectable, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  Injectable,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Warehouse } from 'models/warehouse.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Package } from 'models/package.entity';
+import { Package, Status } from 'models/package.entity';
 import { PackageDTO } from 'dtos/package.dto';
 import { WarehouseService } from 'warehouse/warehouse.service';
 
+
 @Injectable()
 export class PackageService {
-  
-    constructor(@InjectRepository(Package)
+  constructor(
+    @InjectRepository(Package)
     private readonly packageRespository: Repository<Package>,
-    private warehouseService: WarehouseService){       
-    }
+    private warehouseService: WarehouseService,
+  ) {}
 
-    async savePackage(_package:PackageDTO): Promise<PackageDTO> {
-        
-        console.log("[Package ] ", _package);
+  async savePackage(packageDto: PackageDTO): Promise<PackageDTO> {
+    console.log('[Package ] ', packageDto);
 
-        let wharehouse = await this.warehouseService.getNearestWarehouse(_package.to);
+    let warehouse = await this.warehouseService.getNearestWarehouse(
+      packageDto.to,
+    );
+    console.log(`[ warehouse selected ] ->  ${warehouse}`);
+    let newPackage = this.packageRespository.create();
+    newPackage.customer = packageDto.customer;
+    newPackage.from = packageDto.from;
+    newPackage.to = packageDto.to;
+    newPackage.warehouse = warehouse? warehouse: null;
+    newPackage.status = Status.RECEIVED;
 
-        let newPackage = new Package();
-        newPackage.customer = _package.customer;
-        newPackage.from = _package.from;
-        newPackage.to = _package.to;
-        newPackage.warehouse = wharehouse;
-        newPackage.status = _package.status;
+    console.log(`[ Package new ] -> `, newPackage);
 
-        newPackage = await this.packageRespository.save(newPackage);
-        
-        _package.id = newPackage.id;
+    newPackage = await this.packageRespository.save(newPackage);
 
-        return _package;
-    }
+    packageDto.id = newPackage.id;
+    packageDto.status = newPackage.status;
 
+    return packageDto;
+  }
 }

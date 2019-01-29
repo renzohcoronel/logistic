@@ -4,6 +4,7 @@ import { Warehouse } from 'models/warehouse.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistanceService } from './distanceGoogle.service';
 import { resolve } from 'url';
+import { throws } from 'assert';
 
 @Injectable()
 export class WarehouseService {
@@ -18,20 +19,26 @@ export class WarehouseService {
 
        
         const warehouses = await this.getWarehouses();
-        let warehouse_distances = [];
+        let warehouseDistances = [];
         
-        let warehousePromise = warehouses.map( async _warehouse => {
-           let distance =  await this.distanceService.getDistance([_warehouse.city], [to.toString()]);
-           console.log(`[WarehouseService ] ${_warehouse.city} - ${to} Distance: ${distance}`);
-           warehouse_distances.push({ warehouse: _warehouse, distance: distance});
+        let warehousePromise = warehouses.map( async warehouse => {
+           
+           await this.distanceService.getDistance([warehouse.city], [to.toString()]).then(value =>  {
+            console.log(`[WarehouseService ] ${warehouse.city} - ${to} Distance: ${value}`);
+            warehouseDistances.push({ warehouse: warehouse, distance: value});  
+
+           }).catch(err =>{
+                console.log(err.error_message);
+           });      
         });
 
         await Promise.all(warehousePromise);
 
-        console.log(warehouse_distances);
-
-      
-        return null;
+        console.log(`[ Warehouses distances ]`);
+    
+        let value = warehouseDistances.reduce((a, b) => Math.min(a.distance, b.distance)); 
+        console.log("MIMIUM VALUE :");
+        resolve(value);
   
     });
     }

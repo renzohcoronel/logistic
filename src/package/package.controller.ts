@@ -11,7 +11,7 @@ export class PackageController {
   @Post('package')
   savePackage(@Body() packageDto: PackageDTO): any {
     console.log(packageDto);
-    this.packageService.savePackage(packageDto); 
-    return '';
+    return this.packageService.savePackage(packageDto); 
+
   }
 }

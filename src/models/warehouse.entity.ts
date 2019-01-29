@@ -19,7 +19,7 @@ import { Package } from './package.entity';
     city: string;
   
     @Column('int')
-    max_limit: number;
+    maxLimit: number;
 
     @Column('boolean')
     isDelayedAllow: boolean;
