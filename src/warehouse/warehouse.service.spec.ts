@@ -3,8 +3,10 @@ import { WarehouseService } from './warehouse.service';
 import { Repository } from 'typeorm';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {RespositoryWarehouse} from './../mocks/warehouse.repository.mock';
 import {DistanceServiceMock} from './../mocks/distance.service.mock';
+import { Package } from '../models/package.entity';
+import { WarehouseRepository } from './warehouse.repository';
+import { RespositoryWarehouseMook } from './../mocks/warehouse.repository.mock';
 
 
 describe('WarehouseService', () => {
@@ -15,43 +17,32 @@ describe('WarehouseService', () => {
 
       const module = await Test.createTestingModule({
         controllers: [],
-        components:[WarehouseService],
+        components: [
+          {
+            provide: WarehouseRepository,
+            useValue: RespositoryWarehouseMook,
+          }
+        ],        
         providers: [
           {
-            provide: DistanceService,
-            useClass: DistanceServiceMock
+            provide:  DistanceService,
+            useClass : DistanceServiceMock
           },
-          WarehouseService,
-          {
-            provide: Repository,
-            useValue: RespositoryWarehouse,
-          },
-        ],
+          WarehouseService
+        ], 
+        
       }).compile();
    
       warehouseService = module.get<WarehouseService>(WarehouseService);
-
+    
     });
   
-    describe('getNearestWarehouse', () => {
+    describe('getNearestWarehouse', async () => {
       it('should return an object of warehouse', async () => {
-    
-        let distances= [
-          {
-            warehouse: 
-            {
-              id: 2,
-              city: 'Buenos Aires',
-              maxLimit:200, 
-              isDelayedAllow:false, 
-              packages:[]
-            },
-            distance: 50 
-          }
-        ];
+
+       var result = {}
         
-      
-        expect(await warehouseService.getNearestWarehouse("Avellaneda")).toBe(distances);
+        expect(await warehouseService.getNearestWarehouse('La Plata')).toBe(result);
       });
     });
   });
