@@ -6,6 +6,7 @@ import { PackagesModule } from 'package/package.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationDTO } from 'pipes/validationDTO.pipe';
 import { Connection } from 'typeorm';
+import { WarehouseModule } from 'warehouse/warehouse.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { Connection } from 'typeorm';
       synchronize: true,
     })
     ,
-    PackagesModule
+    PackagesModule,
+    WarehouseModule
   ],
   controllers: [AppController],
   providers: [

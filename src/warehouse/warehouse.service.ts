@@ -78,4 +78,9 @@ export class WarehouseService {
       });
     });
   }
+
+  async changeWarehouseActionLimit(idWarehouse,value:ActionWhenLimit): Promise<any>{
+        console.log("ID: ", idWarehouse, " ACTION ", value);
+    return await this.warehouseRepository.update(idWarehouse,{ actionWhenLimit: value });
+  }
 }
