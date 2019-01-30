@@ -27,7 +27,7 @@ export class PackageService {
       try {
         wh = await this.warehouseService.getNearestWarehouse(packageDto.to);
         
-        console.log(`[ warehouse selected ]`, wh);
+        console.log(`[ warehouse selected ] ${ wh.name } - ${ wh.city }`);
         
         let newPackage = this.packageRespository.create();
         newPackage.from = packageDto.from;

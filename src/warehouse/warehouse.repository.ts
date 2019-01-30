@@ -1,9 +1,9 @@
-import { Component } from "@nestjs/common";
+import { Injectable} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Warehouse } from "../models/warehouse.entity";
 
-@Component()
+@Injectable()
 export class WarehouseRepository {
 
     constructor(@InjectRepository(Warehouse)
@@ -11,6 +11,7 @@ export class WarehouseRepository {
     }
 
     async getWarehouses():Promise<Warehouse[]> {
+        console.log("[WarehouseRepository] getWarehouses")
         return this.warehouseRepository.find({ relations: ["packages"] });
      }
 

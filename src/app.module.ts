@@ -18,7 +18,6 @@ import { Connection } from 'typeorm';
       database: process.env.DB_NAME,
       entities: ['src/**/**.entity{.ts,.js}'],
       synchronize: true,
-      logging: true
     })
     ,
     PackagesModule

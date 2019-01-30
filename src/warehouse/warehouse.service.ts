@@ -8,14 +8,16 @@ import { WarehouseRepository } from './warehouse.repository';
 @Injectable()
 export class WarehouseService {
   
-    constructor( private warehouseRepository: WarehouseRepository,
+    constructor(
+        @InjectRepository(Warehouse)
+    private readonly warehouseRepository: Repository<Warehouse>,
     private distanceService: DistanceService){      
     }
 
     async getNearestWarehouse(to:String): Promise<Warehouse>{
         return new Promise<Warehouse> (async (resolve, reject)=>{
 
-        const warehouses = await this.warehouseRepository.getWarehouses();
+        const warehouses = await this.warehouseRepository.find({ relations: ["packages"] });
         let warehouseDistances = [];
         
         let warehousePromise = warehouses.map( async warehouse => {
@@ -39,7 +41,9 @@ export class WarehouseService {
 
     
         if(whSelected.packages.length < whSelected.maxLimit ){
-              if(whSelected.packages.length * 100 / whSelected.packages.length < 0.95 ){
+              const percentage = whSelected.packages.length * 100 / whSelected.maxLimit
+              console.log("[WarehouseService] percentage ", percentage);
+              if(percentage < 95 ){
                   resolve(whSelected);
                 
               } else if( whSelected.isDelayedAllow){
