@@ -6,7 +6,7 @@ import { IsString, IsInt } from "class-validator";
     RECEIVED = "RECEIVED",
     DELIVERED = "DELIVERED",
 }
-  
+
   export class PackageDTO {
 
     id: number;
@@ -18,5 +18,6 @@ import { IsString, IsInt } from "class-validator";
     warehouse: WarehouseDTO;
     @IsString()
     status: Status;
+     
     
   }

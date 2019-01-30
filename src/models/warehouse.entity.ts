@@ -5,6 +5,12 @@ import {
     OneToMany,
   } from 'typeorm';
 import { Package } from './package.entity';
+
+export enum ActionWhenLimit {
+  ACCEPT ="ACCEPT",
+  ACCEPT_DELAYED ="ACCEPT_DELAYED",
+  NARBY_NEXT_WAREHOUSE = "NARBY_NEXT_WAREHOUSE"
+}
   
   @Entity('wharehouse')
   export class Warehouse {
@@ -21,8 +27,8 @@ import { Package } from './package.entity';
     @Column('int')
     maxLimit: number;
 
-    @Column('boolean')
-    isDelayedAllow: boolean;
+    @Column('enum', { enum: ActionWhenLimit })
+    actionWhenLimit: ActionWhenLimit;
 
     @OneToMany(type => Package, _package => _package.warehouse)
     packages: Package[];

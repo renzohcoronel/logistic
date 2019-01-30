@@ -39,15 +39,7 @@ describe('WarehouseService', () => {
     it('should return an object of warehouse', async () => {
       
       var result = {id: 2, name:"WH02", city: 'Buenos Aires', maxLimit:100, isDelayedAllow:false, packages:[]};
-      var warehouse = [
-        {id: 2, name:"WH02", city: 'Buenos Aires', maxLimit:100, isDelayedAllow:false, packages:[]},
-        {id: 3, name:"WH01", city: 'La Plata', maxLimit:100, isDelayedAllow:false, packages:[]},
-      ]
-      
-      const SPY = jest.fn(() => warehouse);
-      jest.spyOn(warehouseRepository, 'find')
-        .mockImplementation(() => SPY(warehouse));
-
+       
       expect(await warehouseService.getNearestWarehouse('Avellaneda')).toBe(
         result,
       );

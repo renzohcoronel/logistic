@@ -11,8 +11,7 @@ class Package {
 class Warehouse {
     name:String
     city: String
-    max_limit: Number
-    isDelayedAllow: Boolean
+    maxLimit: Number
 }
 
 class Customer {
