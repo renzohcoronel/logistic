@@ -26,6 +26,7 @@ describe('WarehouseService', () => {
           provide: DistanceService,
           useClass: DistanceServiceMock,
         },
+        
         WarehouseService,
       ],
     }).compile();
