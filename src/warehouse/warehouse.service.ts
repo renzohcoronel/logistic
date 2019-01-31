@@ -42,8 +42,7 @@ export class WarehouseService {
       let result = warehouseDistances.sort((prev, curr) => {
         return prev.distance < curr.distance ? prev : curr;
       });
-
-      console.log('Warehouse Distances ', result);
+      
       /**
        * if a warehouse reaches the limit, search the next nearest warehouse
        */
@@ -80,7 +79,6 @@ export class WarehouseService {
   }
 
   async changeWarehouseActionLimit(idWarehouse,value:ActionWhenLimit): Promise<any>{
-        console.log("ID: ", idWarehouse, " ACTION ", value);
     return await this.warehouseRepository.update(idWarehouse,{ actionWhenLimit: value });
   }
 }
