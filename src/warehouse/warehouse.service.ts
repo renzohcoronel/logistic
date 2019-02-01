@@ -8,16 +8,13 @@ import { WarehouseRepository } from './warehouse.repository';
 @Injectable()
 export class WarehouseService {
   constructor(
-    @InjectRepository(Warehouse)
-    private readonly warehouseRepository: Repository<Warehouse>,
+    @InjectRepository(WarehouseRepository)private readonly warehouseRepository: WarehouseRepository,
     private distanceService: DistanceService,
   ) {}
 
   async getNearestWarehouse(to: String): Promise<Warehouse> {
     return new Promise<Warehouse>(async (resolve, reject) => {
-      const warehouses = await this.warehouseRepository.find({
-        relations: ['packages'],
-      });
+      const warehouses = await this.warehouseRepository.getWarehouses();
       let warehouseDistances = [];
 
       let warehousePromise = warehouses.map(async warehouse => {
@@ -33,6 +30,7 @@ export class WarehouseService {
           })
           .catch(err => {
             console.log(err.error_message);
+            reject(err);
           });
       });
 

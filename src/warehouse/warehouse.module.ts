@@ -4,11 +4,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Warehouse } from 'models/warehouse.entity';
 import { DistanceService } from './distanceGoogle.service';
 import { WarehouseController } from './warehouse.controller';
+import { WarehouseRepository } from './warehouse.repository';
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Warehouse])
+    TypeOrmModule.forFeature([Warehouse, WarehouseRepository])
   ],
   controllers:[ WarehouseController]
   ,

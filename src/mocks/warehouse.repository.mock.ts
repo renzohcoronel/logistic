@@ -1,12 +1,11 @@
 import { Warehouse } from "../models/warehouse.entity";
 
-export class RespositoryWarehouseMook {
+export class WarehouseRepositoryMock {
 
-    async find(any):Promise<Warehouse[]> {
-        return new Promise<Warehouse[]>(async (resolve, rejected)=>{
-           return await [
-                {id: 2, name:"WH02", city: 'Buenos Aires', maxLimit:100, isDelayedAllow:false, packages:[]},
-                {id: 3, name:"WH01", city: 'La Plata', maxLimit:100, isDelayedAllow:false, packages:[]},
+    async getWarehouses():Promise<Warehouse[]> {
+        return new Promise<Warehouse[]>((resolve, rejected)=>{
+           return [
+                {id: 2, name:"WH02", city: 'Buenos Aires', maxLimit:100, packages:[]}
               ];
         });
         

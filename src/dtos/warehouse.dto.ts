@@ -13,7 +13,5 @@ import { ApiModelProperty } from '@nestjs/swagger';
     @ApiModelProperty()
     @IsString()
     city: string;
-    @ApiModelProperty()
-    max_limit: number; 
   
   }

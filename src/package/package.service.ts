@@ -5,12 +5,12 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Warehouse } from 'models/warehouse.entity';
+import { Warehouse } from './../models/warehouse.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Package, Status } from 'models/package.entity';
+import { Package, Status } from './../models/package.entity';
 import { PackageDTO } from 'dtos/package.dto';
-import { WarehouseService } from 'warehouse/warehouse.service';
-import { Customer } from 'models/customer.entity';
+import { WarehouseService } from './../warehouse/warehouse.service';
+import { Customer } from './../models/customer.entity';
 
 @Injectable()
 export class PackageService {
@@ -27,7 +27,6 @@ export class PackageService {
       try {
         wh = await this.warehouseService.getNearestWarehouse(packageDto.to);
         
-        console.log(`[ warehouse selected ] ${ wh.name } - ${ wh.city }`);
         
         let newPackage = this.packageRespository.create();
         newPackage.from = packageDto.from;
@@ -38,14 +37,17 @@ export class PackageService {
         newPackage.status = Status.RECEIVED;
   
         newPackage = await this.packageRespository.save(newPackage);
+
   
         packageDto.id = newPackage.id;
         packageDto.warehouse.id = newPackage.warehouse.id;
         packageDto.warehouse.city = newPackage.warehouse.city;
         packageDto.warehouse.name = newPackage.warehouse.name;
         packageDto.status = newPackage.status;
+
   
         resolve(packageDto);
+        
         
       } catch (error) {
         rejected(error);
