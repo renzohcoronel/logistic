@@ -7,14 +7,14 @@ import {
 import { Package } from './package.entity';
 
 export enum ActionWhenLimit {
-  ACCEPT ="ACCEPT",
-  ACCEPT_DELAYED ="ACCEPT_DELAYED",
-  NARBY_NEXT_WAREHOUSE = "NARBY_NEXT_WAREHOUSE"
+  ACCEPT = 'ACCEPT',
+  ACCEPT_DELAYED = 'ACCEPT_DELAYED',
+  NARBY_NEXT_WAREHOUSE = 'NARBY_NEXT_WAREHOUSE',
 }
-  
-  @Entity('wharehouse')
+
+@Entity('wharehouse')
   export class Warehouse {
-  
+
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -23,7 +23,7 @@ export enum ActionWhenLimit {
 
     @Column()
     city: string;
-  
+
     @Column('int')
     maxLimit: number;
 
@@ -32,6 +32,4 @@ export enum ActionWhenLimit {
 
     @OneToMany(type => Package, _package => _package.warehouse)
     packages: Package[];
-  
-  
   }

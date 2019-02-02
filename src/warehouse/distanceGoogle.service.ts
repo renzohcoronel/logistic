@@ -1,24 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-var distance = require('google-distance-matrix');
+import * as distance from 'google-distance-matrix';
 distance.key(process.env.GOOGLE_CLIENT_KEY);
 
 @Injectable()
 export class DistanceService {
+
+  private readonly logger = new Logger(DistanceService.name);
+
   constructor() {}
 
   async getDistance(origin: string[], destination: string[]) {
     return new Promise<any>(async (resolve, reject) => {
       await distance.matrix(origin, destination, (error, distances) => {
         if (error) {
-          console.log(`[DistanceService ] Error ${error}`);
+          this.logger.log(`Error ${error}`);
           return reject(error);
         }
-   
-        console.log(JSON.stringify(distances));
-       
-        if (distances.status == 'OK') {
-          if (distances.rows[0].elements[0].status == 'OK') {
+        if (distances.status === 'OK') {
+          if (distances.rows[0].elements[0].status === 'OK') {
             resolve(distances.rows[0].elements[0].distance.value);
           } else {
             resolve(null);
@@ -27,8 +27,6 @@ export class DistanceService {
           resolve(null);
         }
       });
-
-      // resolve(Math.floor((Math.random() * 10) + 1))
     });
   }
 }

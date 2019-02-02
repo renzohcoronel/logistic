@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistanceService } from './distanceGoogle.service';
@@ -7,29 +7,28 @@ import { WarehouseRepository } from './warehouse.repository';
 
 @Injectable()
 export class WarehouseService {
+  private readonly logger = new Logger(WarehouseService.name);
+
   constructor(
-    @InjectRepository(WarehouseRepository)private readonly warehouseRepository: WarehouseRepository,
+    @InjectRepository(WarehouseRepository)
+    private readonly warehouseRepository: WarehouseRepository,
     private distanceService: DistanceService,
   ) {}
 
-  async getNearestWarehouse(to: String): Promise<Warehouse> {
+  async getNearestWarehouse(to: string): Promise<Warehouse> {
     return new Promise<Warehouse>(async (resolve, reject) => {
       const warehouses = await this.warehouseRepository.getWarehouses();
-      let warehouseDistances = [];
+      const warehouseDistances = [];
 
-      let warehousePromise = warehouses.map(async warehouse => {
+      const warehousePromise = warehouses.map(async wh => {
         await this.distanceService
-          .getDistance([warehouse.city], [to.toString()])
+          .getDistance([wh.city], [to.toString()])
           .then(value => {
-            console.log(
-              `[WarehouseService ] ${
-                warehouse.city
-              } - ${to} Distance: ${value}`,
-            );
-            warehouseDistances.push({ warehouse: warehouse, distance: value });
+            this.logger.log(` ${wh.city} - ${to} Distance: ${value}`);
+            warehouseDistances.push({ warehouse: wh, distance: value });
           })
           .catch(err => {
-            console.log(err.error_message);
+            this.logger.log(err.error_message);
             reject(err);
           });
       });
@@ -37,28 +36,29 @@ export class WarehouseService {
       await Promise.all(warehousePromise);
 
       // search nearest warehouse
-      let result = warehouseDistances.sort((prev, curr) => {
+      const result = warehouseDistances.sort((prev, curr) => {
         return prev.distance < curr.distance ? prev : curr;
       });
-      
+
       /**
        * if a warehouse reaches the limit, search the next nearest warehouse
        */
 
       result.forEach(wh => {
-        let whSelected = wh.warehouse;
+        const whSelected = wh.warehouse;
         const percentage =
           (whSelected.packages.length * 100) / whSelected.maxLimit;
-        console.log('[WarehouseService] percentage ', percentage);
+        this.logger.log(
+          ` Warehouse ${whSelected.name} Occupied %${percentage}`,
+        );
 
-        if (whSelected.packages.length < whSelected.maxLimit) {
+        if (whSelected.packages.length <= whSelected.maxLimit) {
           if (percentage < 95) {
             resolve(whSelected);
-          } else if (
-            whSelected.actionWhenLimit === ActionWhenLimit.ACCEPT_DELAYED
-          ) {
+          } else if (whSelected.actionWhenLimit === ActionWhenLimit.ACCEPT_DELAYED) {
             resolve(whSelected);
-          } else {
+          }  else if (whSelected.actionWhenLimit === ActionWhenLimit.NARBY_NEXT_WAREHOUSE){
+          }else {
             reject({
               id: whSelected.id,
               name: whSelected.name,
@@ -76,7 +76,12 @@ export class WarehouseService {
     });
   }
 
-  async changeWarehouseActionLimit(idWarehouse,value:ActionWhenLimit): Promise<any>{
-    return await this.warehouseRepository.update(idWarehouse,{ actionWhenLimit: value });
+  async changeWarehouseActionLimit(
+    idWarehouse,
+    value: ActionWhenLimit,
+  ): Promise<any> {
+    return await this.warehouseRepository.update(idWarehouse, {
+      actionWhenLimit: value,
+    });
   }
 }

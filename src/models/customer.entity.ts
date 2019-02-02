@@ -5,8 +5,8 @@ import {
     OneToMany,
   } from 'typeorm';
 import { Package } from './package.entity';
-  
-  @Entity('customer')
+
+@Entity('customer')
   export class Customer {
 
     @PrimaryGeneratedColumn()
@@ -20,11 +20,9 @@ import { Package } from './package.entity';
     @Column()
     phone: string;
     @Column()
-    email: string; 
+    email: string;
 
     @OneToMany(type => Package, pkg => pkg.customer)
-    packages: Package[]
-  
-  
-  
+    packages: Package[];
+
   }

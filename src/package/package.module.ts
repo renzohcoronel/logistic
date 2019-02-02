@@ -10,7 +10,7 @@ import { Customer } from 'models/customer.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Package, Customer]),
-    WarehouseModule
+    WarehouseModule,
   ],
   controllers: [PackageController],
   providers: [PackageService],

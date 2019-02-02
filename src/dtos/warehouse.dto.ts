@@ -1,9 +1,7 @@
-import { PackageDTO } from "./package.dto";
-import { IsString, IsInt } from "class-validator";
+import { IsString, IsInt } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
- export class WarehouseDTO {
-  
+export class WarehouseDTO {
     @ApiModelProperty()
     @IsInt()
     id: number;
@@ -13,5 +11,5 @@ import { ApiModelProperty } from '@nestjs/swagger';
     @ApiModelProperty()
     @IsString()
     city: string;
-  
+
   }

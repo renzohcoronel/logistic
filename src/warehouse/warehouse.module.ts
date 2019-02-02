@@ -6,16 +6,10 @@ import { DistanceService } from './distanceGoogle.service';
 import { WarehouseController } from './warehouse.controller';
 import { WarehouseRepository } from './warehouse.repository';
 
-
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Warehouse, WarehouseRepository])
-  ],
-  controllers:[ WarehouseController]
-  ,
-  providers: [
-    DistanceService,
-    WarehouseService],
-  exports: [ WarehouseService ]
+  imports: [TypeOrmModule.forFeature([Warehouse, WarehouseRepository])],
+  controllers: [WarehouseController],
+  providers: [DistanceService, WarehouseService],
+  exports: [WarehouseService],
 })
 export class WarehouseModule {}

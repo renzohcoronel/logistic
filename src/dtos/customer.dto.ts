@@ -1,7 +1,7 @@
 import { IsString, IsInt } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
-  export class CustomerDTO {
+export class CustomerDTO {
 
     @ApiModelProperty({example: 1})
     @IsInt()
@@ -20,6 +20,5 @@ import { ApiModelProperty } from '@nestjs/swagger';
     phone: string;
     @ApiModelProperty({example: 'renzo.h.coronel@gmail.com'})
     @IsString()
-    email: string; 
-  
-  }
+    email: string;
+}

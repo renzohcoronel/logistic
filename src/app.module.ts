@@ -13,7 +13,7 @@ import { WarehouseModule } from 'warehouse/warehouse.module';
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT,10),
+      port: parseInt(process.env.DB_PORT, 10),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
@@ -22,7 +22,7 @@ import { WarehouseModule } from 'warehouse/warehouse.module';
     })
     ,
     PackagesModule,
-    WarehouseModule
+    WarehouseModule,
   ],
   controllers: [AppController],
   providers: [

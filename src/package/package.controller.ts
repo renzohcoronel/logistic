@@ -5,7 +5,7 @@ import { PackageService } from './package.service';
 
 @Controller('api')
 export class PackageController {
-  
+
   constructor( private readonly packageService: PackageService) {}
 
   @Post('package')
@@ -16,6 +16,6 @@ export class PackageController {
           error: e,
         }, HttpStatus.INTERNAL_SERVER_ERROR);
       });
-      
+
   }
 }

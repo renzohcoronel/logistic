@@ -3,6 +3,7 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Warehouse } from './../models/warehouse.entity';
@@ -14,6 +15,8 @@ import { Customer } from './../models/customer.entity';
 
 @Injectable()
 export class PackageService {
+  private readonly logger = new Logger(PackageService.name);
+
   constructor(
     @InjectRepository(Package)
     private readonly packageRespository: Repository<Package>,
@@ -22,12 +25,9 @@ export class PackageService {
 
   async savePackage(packageDto: PackageDTO): Promise<PackageDTO> {
     return new Promise<PackageDTO>(async (resolve, rejected) => {
-
-      let wh = null
+      let wh = null;
       try {
         wh = await this.warehouseService.getNearestWarehouse(packageDto.to);
-        
-        
         let newPackage = this.packageRespository.create();
         newPackage.from = packageDto.from;
         newPackage.customer = new Customer();
@@ -35,27 +35,21 @@ export class PackageService {
         newPackage.to = packageDto.to;
         newPackage.warehouse = wh ? wh : null;
         newPackage.status = Status.RECEIVED;
-  
+
         newPackage = await this.packageRespository.save(newPackage);
 
-  
+        this.logger.log(`Package: ${newPackage.id}`);
+
         packageDto.id = newPackage.id;
         packageDto.warehouse.id = newPackage.warehouse.id;
         packageDto.warehouse.city = newPackage.warehouse.city;
         packageDto.warehouse.name = newPackage.warehouse.name;
         packageDto.status = newPackage.status;
 
-  
         resolve(packageDto);
-        
-        
       } catch (error) {
         rejected(error);
-        
       }
-        
-
-     
     });
   }
 }

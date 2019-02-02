@@ -1,14 +1,14 @@
-import { WarehouseDTO } from "./warehouse.dto";
-import { CustomerDTO } from "./customer.dto";
-import { IsString, IsInt } from "class-validator";
+import { WarehouseDTO } from './warehouse.dto';
+import { CustomerDTO } from './customer.dto';
+import { IsString, IsInt } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
- export enum Status {
-    RECEIVED = "RECEIVED",
-    DELIVERED = "DELIVERED",
+export enum Status {
+    RECEIVED = 'RECEIVED',
+    DELIVERED = 'DELIVERED',
 }
 
-  export class PackageDTO {
+export class PackageDTO {
 
     @ApiModelProperty({example: null})
     id: number;
@@ -22,9 +22,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
     to: string;
     @ApiModelProperty({required: false, example: {}})
     warehouse: WarehouseDTO;
-    @ApiModelProperty({required: false, example:''})
+    @ApiModelProperty({required: false, example: ''})
     @IsString()
     status: Status;
-     
-    
   }

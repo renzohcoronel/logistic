@@ -29,7 +29,7 @@ describe('PackageService', async () => {
         },
         {
             provide: getRepositoryToken(WarehouseRepository),
-            useClass: WarehouseRepositoryMock
+            useClass: WarehouseRepositoryMock,
           },
           {
             provide: DistanceService,
@@ -38,7 +38,7 @@ describe('PackageService', async () => {
         , WarehouseService,
         PackageService,
       ],
-     imports :[  ]
+     imports : [],
     }).compile();
 
     warehouseService = m.get<WarehouseService>(WarehouseService);
@@ -111,14 +111,11 @@ describe('PackageService', async () => {
         status: 'RECEIVED',
       };
 
-     warehouseService.getNearestWarehouse = jest.fn(()=> nearestWarehouse);
+      warehouseService.getNearestWarehouse = jest.fn(() => nearestWarehouse);
 
-     packageRespository.save = jest.fn(()=> packageSaved);
-     packageRespository.create = jest.fn(()=> new Customer())
-  
-      expect(await packageService.savePackage(packageDTO)).toEqual(
-        packageDTOSend
-      );
+      packageRespository.save = jest.fn(() => packageSaved);
+      packageRespository.create = jest.fn(() => new Customer());
+      expect(await packageService.savePackage(packageDTO)).toEqual(packageDTOSend);
     });
   });
 });
