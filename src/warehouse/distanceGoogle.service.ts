@@ -7,12 +7,15 @@ distance.key(process.env.GOOGLE_CLIENT_KEY);
 export class DistanceService {
 
   private readonly logger = new Logger(DistanceService.name);
+  d: any;
 
-  constructor() {}
+  constructor() {
+    this.d = distance;
+  }
 
   async getDistance(origin: string[], destination: string[]) {
     return new Promise<any>(async (resolve, reject) => {
-      await distance.matrix(origin, destination, (error, distances) => {
+      await this.d.matrix(origin, destination, (error, distances) => {
         if (error) {
           this.logger.log(`Error ${error}`);
           return reject(error);

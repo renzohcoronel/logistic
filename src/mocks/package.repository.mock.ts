@@ -1,3 +1,1 @@
-export class PackageRespositoryMock {
-    
-}
+export class PackageRespositoryMock {}
