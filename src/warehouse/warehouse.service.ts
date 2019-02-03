@@ -16,7 +16,9 @@ export class WarehouseService {
 
   async getNearestWarehouse(to: string): Promise<Warehouse> {
     return new Promise<Warehouse>(async (resolve, reject) => {
-      const warehouses = await this.warehouseRepository.find({ relations: ['packages'] });
+      const warehouses = await this.warehouseRepository.find({
+        relations: ['packages'],
+      });
       const warehouseDistances = [];
 
       const warehousePromise = warehouses.map(async wh => {
@@ -54,10 +56,14 @@ export class WarehouseService {
         if (whSelected.packages.length <= whSelected.maxLimit) {
           if (percentage < 95) {
             resolve(whSelected);
-          } else if (whSelected.actionWhenLimit === ActionWhenLimit.ACCEPT_DELAYED) {
+          } else if (
+            whSelected.actionWhenLimit === ActionWhenLimit.ACCEPT_DELAYED
+          ) {
             resolve(whSelected);
-          }  else if (whSelected.actionWhenLimit === ActionWhenLimit.NARBY_NEXT_WAREHOUSE){
-          }else {
+          } else if (
+            whSelected.actionWhenLimit === ActionWhenLimit.NARBY_NEXT_WAREHOUSE
+          ) {
+          } else {
             reject({
               id: whSelected.id,
               name: whSelected.name,
@@ -79,8 +85,7 @@ export class WarehouseService {
     idWarehouse,
     value: ActionWhenLimit,
   ): Promise<Warehouse> {
-
-    let wh = await this.warehouseRepository.findOneOrFail(idWarehouse);
+    const wh = await this.warehouseRepository.findOneOrFail(idWarehouse);
     wh.actionWhenLimit = value;
     return await this.warehouseRepository.save(wh);
   }

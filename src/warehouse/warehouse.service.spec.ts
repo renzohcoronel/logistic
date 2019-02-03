@@ -3,7 +3,6 @@ import { WarehouseService } from './warehouse.service';
 import { Repository } from 'typeorm';
 import { Test, TestingModuleBuilder, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Package } from '../models/package.entity';
 import { Warehouse, ActionWhenLimit } from '../models/warehouse.entity';
 import { distanServiceMock, warehouseRepositoryMock } from './../mocks/mocks';
 
@@ -80,7 +79,7 @@ describe('WarehouseService', async () => {
         .mockResolvedValue(1)
         .mockResolvedValueOnce(10);
 
-      const result =  {
+      const result = {
         id: 2,
         name: 'WH02',
         city: 'Rosario',
@@ -89,8 +88,9 @@ describe('WarehouseService', async () => {
         packages: [],
       };
 
-      expect(warehouseService.getNearestWarehouse('Avellaneda')).resolves.toEqual(
-        result);
+      expect(
+        warehouseService.getNearestWarehouse('Avellaneda'),
+      ).resolves.toEqual(result);
     });
 
     it('exception from distanceService', async () => {
@@ -117,10 +117,13 @@ describe('WarehouseService', async () => {
       );
 
       distanceService.getDistance = jest
-        .fn().mockResolvedValue(1)
+        .fn()
+        .mockResolvedValue(1)
         .mockRejectedValue('');
 
-      expect(warehouseService.getNearestWarehouse('Avellaneda')).rejects.toBe('');
+      expect(warehouseService.getNearestWarehouse('Avellaneda')).rejects.toBe(
+        '',
+      );
     });
 
     it('delayed', async () => {
@@ -151,7 +154,7 @@ describe('WarehouseService', async () => {
         .mockResolvedValue(1)
         .mockResolvedValueOnce(10);
 
-      const result =  {
+      const result = {
         id: 1,
         name: 'WH01',
         city: 'Buenos Aires',
@@ -160,8 +163,9 @@ describe('WarehouseService', async () => {
         packages: new Array(20),
       };
 
-      expect(warehouseService.getNearestWarehouse('Avellaneda')).resolves.toEqual(
-        result);
+      expect(
+        warehouseService.getNearestWarehouse('Avellaneda'),
+      ).resolves.toEqual(result);
     });
 
     it('its 95% occupped', async () => {
@@ -179,11 +183,11 @@ describe('WarehouseService', async () => {
           ],
       );
 
-      distanceService.getDistance = jest
-        .fn()
-        .mockResolvedValue(1);
+      distanceService.getDistance = jest.fn().mockResolvedValue(1);
 
-      expect(warehouseService.getNearestWarehouse('Avellaneda')).rejects.toEqual({
+      expect(
+        warehouseService.getNearestWarehouse('Avellaneda'),
+      ).rejects.toEqual({
         id: 1,
         name: 'WH01',
         city: 'Buenos Aires',
@@ -192,32 +196,25 @@ describe('WarehouseService', async () => {
     });
 
     it('update warehouse params actionWhenLimit', async () => {
+      warehousesRepository.findOneOrFail = jest.fn(async () => {
+        const wh = new Warehouse();
+        wh.id = 1;
+        wh.name = 'WH01';
+        wh.city = 'Buenos Aires';
+        wh.maxLimit = 100;
+        wh.actionWhenLimit = ActionWhenLimit.ACCEPT;
+        return wh;
+      });
 
-      warehousesRepository.findOneOrFail = jest.fn(
-        async () =>
-          {
-            const wh = new Warehouse();
-            wh.id = 1;
-            wh.name = 'WH01';
-            wh.city = 'Buenos Aires';
-            wh.maxLimit = 100;
-            wh.actionWhenLimit = ActionWhenLimit.ACCEPT;
-            return wh;
-          },
-      );
-
-      warehousesRepository.save = jest.fn(
-        async () =>
-          {
-            const wh = new Warehouse();
-            wh.id = 1;
-            wh.name = 'WH01';
-            wh.city = 'Buenos Aires';
-            wh.maxLimit = 100;
-            wh.actionWhenLimit = ActionWhenLimit.ACCEPT_DELAYED;
-            return wh;
-          },
-      );
+      warehousesRepository.save = jest.fn(async () => {
+        const wh = new Warehouse();
+        wh.id = 1;
+        wh.name = 'WH01';
+        wh.city = 'Buenos Aires';
+        wh.maxLimit = 100;
+        wh.actionWhenLimit = ActionWhenLimit.ACCEPT_DELAYED;
+        return wh;
+      });
 
       const whModified = new Warehouse();
       whModified.id = 1;
@@ -226,8 +223,12 @@ describe('WarehouseService', async () => {
       whModified.maxLimit = 100;
       whModified.actionWhenLimit = ActionWhenLimit.ACCEPT_DELAYED;
 
-      expect(warehouseService.changeWarehouseActionLimit(1, ActionWhenLimit.ACCEPT_DELAYED)).resolves.toEqual(whModified);
+      expect(
+        warehouseService.changeWarehouseActionLimit(
+          1,
+          ActionWhenLimit.ACCEPT_DELAYED,
+        ),
+      ).resolves.toEqual(whModified);
     });
-
   });
 });

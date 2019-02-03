@@ -16,7 +16,6 @@ export enum Status {
 
 @Entity('package')
 export class Package {
-
   @PrimaryGeneratedColumn()
   id: number;
 

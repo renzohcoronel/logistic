@@ -1,9 +1,4 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    OneToMany,
-  } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Package } from './package.entity';
 
 export enum ActionWhenLimit {
@@ -13,23 +8,22 @@ export enum ActionWhenLimit {
 }
 
 @Entity('wharehouse')
-  export class Warehouse {
+export class Warehouse {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  name: string;
 
-    @Column()
-    name: string;
+  @Column()
+  city: string;
 
-    @Column()
-    city: string;
+  @Column('int')
+  maxLimit: number;
 
-    @Column('int')
-    maxLimit: number;
+  @Column('enum', { enum: ActionWhenLimit })
+  actionWhenLimit: ActionWhenLimit;
 
-    @Column('enum', { enum: ActionWhenLimit })
-    actionWhenLimit: ActionWhenLimit;
-
-    @OneToMany(type => Package, _package => _package.warehouse)
-    packages: Package[];
-  }
+  @OneToMany(type => Package, _package => _package.warehouse)
+  packages: Package[];
+}

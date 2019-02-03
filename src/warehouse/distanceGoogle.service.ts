@@ -5,7 +5,6 @@ distance.key(process.env.GOOGLE_CLIENT_KEY);
 
 @Injectable()
 export class DistanceService {
-
   private readonly logger = new Logger(DistanceService.name);
   d: any;
 

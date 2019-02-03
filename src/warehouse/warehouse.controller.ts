@@ -9,17 +9,22 @@ import {
   Logger,
 } from '@nestjs/common';
 import { WarehouseService } from './warehouse.service';
-import { ActionWhenLimit } from 'models/warehouse.entity';
-import { ApiImplicitQuery, ApiImplicitParam } from '@nestjs/swagger';
-import { WarehouseDTO } from 'dtos/warehouse.dto';
+import {
+  ApiImplicitQuery,
+  ApiImplicitParam,
+  ApiOperation,
+} from '@nestjs/swagger';
+import { WarehouseDTO } from './../dtos/warehouse.dto';
 
 @Controller('api')
 export class WarehouseController {
-
   private readonly logger = new Logger(WarehouseController.name);
 
   constructor(private serviceWarehouse: WarehouseService) {}
 
+  @ApiOperation({
+    title: 'Update warehouse decision action when it is 95% occupied ',
+  })
   @ApiImplicitParam({ name: 'id', description: 'id of the warehouses' })
   @ApiImplicitQuery({
     name: 'actionLimit',
@@ -27,24 +32,30 @@ export class WarehouseController {
   })
   @Put('warehouse/:id')
   async updateWarehouseActionLimit(@Param() params, @Query() query) {
-    return new Promise<WarehouseDTO>( (resolve, reject) => this.serviceWarehouse
-      .changeWarehouseActionLimit(params.id, query.actionLimit).then(
-        (wh) => {
-          this.logger.log(wh);
+    return new Promise<WarehouseDTO>((resolve, reject) =>
+      this.serviceWarehouse
+        .changeWarehouseActionLimit(params.id, query.actionLimit)
+        .then(wh => {
           const whDto = new WarehouseDTO();
           whDto.id = wh.id;
           whDto.city = wh.city;
           whDto.name = wh.name;
+
+          this.logger.log(`Updated warehouse ${whDto.name}`);
+
           resolve(whDto);
         })
-      .catch(e => {
-        reject(new HttpException(
-          {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: e.message,
-          },
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        ));
-      }));
+        .catch(e => {
+          reject(
+            new HttpException(
+              {
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: e.message,
+              },
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            ),
+          );
+        }),
+    );
   }
 }

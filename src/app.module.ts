@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PackagesModule } from 'package/package.module';
+import { PackagesModule } from './package/package.module';
 import { APP_PIPE } from '@nestjs/core';
-import { ValidationDTO } from 'pipes/validationDTO.pipe';
+import { ValidationDTO } from './pipes/validationDTO.pipe';
 import { Connection } from 'typeorm';
-import { WarehouseModule } from 'warehouse/warehouse.module';
+import { WarehouseModule } from './warehouse/warehouse.module';
 
 @Module({
   imports: [
@@ -17,10 +17,9 @@ import { WarehouseModule } from 'warehouse/warehouse.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: ['src/**/**.entity{.ts,.js}'],
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
-    })
-    ,
+    }),
     PackagesModule,
     WarehouseModule,
   ],
@@ -30,7 +29,8 @@ import { WarehouseModule } from 'warehouse/warehouse.module';
       provide: APP_PIPE,
       useClass: ValidationDTO,
     },
-    AppService],
+    AppService,
+  ],
 })
 export class AppModule {
   constructor(private readonly connection: Connection) {}

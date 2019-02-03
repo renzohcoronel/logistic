@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { Warehouse } from './../models/warehouse.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Package, Status } from './../models/package.entity';
-import { PackageDTO } from 'dtos/package.dto';
+import { PackageDTO } from './../dtos/package.dto';
 import { WarehouseService } from './../warehouse/warehouse.service';
 import { Customer } from './../models/customer.entity';
 

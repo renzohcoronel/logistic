@@ -54,7 +54,7 @@ describe('PackageService', async () => {
 
   describe('savePackage', () => {
     it('should save a new package', async () => {
-      const nearestWarehouse = Object.assign( new Warehouse(), {
+      const nearestWarehouse = Object.assign(new Warehouse(), {
         id: 1,
         name: 'WH01',
         city: 'Buenos Aires',
@@ -75,7 +75,7 @@ describe('PackageService', async () => {
           email: 'renzo.h.coronel@gmail.com',
         }),
         to: 'Avellaneda',
-        warehouse: Object.assign( new Warehouse(), {
+        warehouse: Object.assign(new Warehouse(), {
           id: 1,
           name: 'WH01',
           city: 'Buenos Aires',
@@ -116,7 +116,7 @@ describe('PackageService', async () => {
           city: 'Buenos Aires',
           name: 'WH01',
         }),
-        status:  Status.RECEIVED,
+        status: Status.RECEIVED,
       };
 
       warehouseService.getNearestWarehouse = jest.fn(() => nearestWarehouse);
