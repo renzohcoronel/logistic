@@ -1,17 +1,22 @@
 import { Test, TestingModuleBuilder, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Package, Status } from './../models/package.entity';
-import { Warehouse } from '../models/warehouse.entity';
-import { WarehouseRepositoryMock } from './../mocks/warehouse.repository.mock';
-import { PackageRespositoryMock } from '../mocks/package.repository.mock';
+import { Warehouse, ActionWhenLimit } from '../models/warehouse.entity';
 import { WarehouseService } from './../warehouse/warehouse.service';
 import { PackageService } from './../package/package.service';
 import { Repository } from 'typeorm';
-import { WarehouseRepository } from '../warehouse/warehouse.repository';
 import { DistanceService } from '../warehouse/distanceGoogle.service';
-import { DistanceServiceMock } from '../mocks/distance.service.mock';
 import { Customer } from '../models/customer.entity';
 import { WarehouseDTO } from './../dtos/warehouse.dto';
+import { CustomerDTO } from './../dtos/customer.dto';
+import { async } from 'rxjs/internal/scheduler/async';
+
+import {
+  distanServiceMock,
+  warehouseRepositoryMock,
+  packagesRepository,
+} from './../mocks/mocks';
+import { Stats } from 'fs';
 
 describe('PackageService', async () => {
   let m: TestingModule;
@@ -20,25 +25,24 @@ describe('PackageService', async () => {
   let packageService: PackageService;
 
   beforeEach(async () => {
-
     m = await Test.createTestingModule({
       providers: [
         {
           provide: getRepositoryToken(Package),
-          useClass: PackageRespositoryMock,
+          useValue: packagesRepository,
         },
         {
-            provide: getRepositoryToken(WarehouseRepository),
-            useClass: WarehouseRepositoryMock,
-          },
-          {
-            provide: DistanceService,
-            useClass: DistanceServiceMock,
-          }
-        , WarehouseService,
+          provide: getRepositoryToken(Warehouse),
+          useValue: warehouseRepositoryMock,
+        },
+        {
+          provide: DistanceService,
+          useValue: distanServiceMock,
+        },
+        WarehouseService,
         PackageService,
       ],
-     imports : [],
+      imports: [],
     }).compile();
 
     warehouseService = m.get<WarehouseService>(WarehouseService);
@@ -49,46 +53,46 @@ describe('PackageService', async () => {
   });
 
   describe('savePackage', () => {
-    it('should return an object of warehouse', async () => {
-      const nearestWarehouse = {
+    it('should save a new package', async () => {
+      const nearestWarehouse = Object.assign( new Warehouse(), {
         id: 1,
         name: 'WH01',
         city: 'Buenos Aires',
         maxLimit: 70,
         actionWhenLimit: 'ACCEPT',
         packages: [],
-      };
+      });
 
-      const packageSaved = {
+      const packageSaved = Object.assign(new Package(), {
         id: 11,
         from: 'Cordoba',
-        customer: {
+        customer: Object.assign(new Customer(), {
           id: 1,
           name: 'Renzo',
           surname: 'Coronel',
           adress: 'Calle 62',
           phone: '2314619368',
           email: 'renzo.h.coronel@gmail.com',
-        },
+        }),
         to: 'Avellaneda',
-        warehouse: {
+        warehouse: Object.assign( new Warehouse(), {
           id: 1,
           name: 'WH01',
           city: 'Buenos Aires',
-        },
-        status: 'RECEIVED',
-      };
+        }),
+        status: Status.RECEIVED,
+      });
 
       const packageDTO = {
         id: 11,
-        customer: {
+        customer: Object.assign(new CustomerDTO(), {
           id: 1,
           name: 'Renzo',
           surname: 'Coronel',
           adress: 'Calle 62',
           phone: '2314619368',
           email: 'renzo.h.coronel@gmail.com',
-        },
+        }),
         from: 'Cordoba',
         to: 'Avellaneda',
         warehouse: new WarehouseDTO(),
@@ -97,25 +101,31 @@ describe('PackageService', async () => {
 
       const packageDTOSend = {
         id: 11,
-        customer: {
+        customer: Object.assign(new CustomerDTO(), {
           id: 1,
           name: 'Renzo',
           surname: 'Coronel',
           adress: 'Calle 62',
           phone: '2314619368',
           email: 'renzo.h.coronel@gmail.com',
-        },
+        }),
         from: 'Cordoba',
         to: 'Avellaneda',
-        warehouse: Object.assign(new WarehouseDTO(), { id: 1, city: 'Buenos Aires', name: 'WH01' }),
-        status: 'RECEIVED',
+        warehouse: Object.assign(new WarehouseDTO(), {
+          id: 1,
+          city: 'Buenos Aires',
+          name: 'WH01',
+        }),
+        status:  Status.RECEIVED,
       };
 
       warehouseService.getNearestWarehouse = jest.fn(() => nearestWarehouse);
 
       packageRespository.save = jest.fn(() => packageSaved);
       packageRespository.create = jest.fn(() => new Customer());
-      expect(await packageService.savePackage(packageDTO)).toEqual(packageDTOSend);
+      expect(await packageService.savePackage(packageDTO)).toEqual(
+        packageDTOSend,
+      );
     });
   });
 });

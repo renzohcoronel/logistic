@@ -3,21 +3,20 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistanceService } from './distanceGoogle.service';
 import { Warehouse, ActionWhenLimit } from '../models/warehouse.entity';
-import { WarehouseRepository } from './warehouse.repository';
 
 @Injectable()
 export class WarehouseService {
   private readonly logger = new Logger(WarehouseService.name);
 
   constructor(
-    @InjectRepository(WarehouseRepository)
-    private readonly warehouseRepository: WarehouseRepository,
+    @InjectRepository(Warehouse)
+    private readonly warehouseRepository: Repository<Warehouse>,
     private distanceService: DistanceService,
   ) {}
 
   async getNearestWarehouse(to: string): Promise<Warehouse> {
     return new Promise<Warehouse>(async (resolve, reject) => {
-      const warehouses = await this.warehouseRepository.getWarehouses();
+      const warehouses = await this.warehouseRepository.find({ relations: ['packages'] });
       const warehouseDistances = [];
 
       const warehousePromise = warehouses.map(async wh => {
@@ -79,9 +78,10 @@ export class WarehouseService {
   async changeWarehouseActionLimit(
     idWarehouse,
     value: ActionWhenLimit,
-  ): Promise<any> {
-    return await this.warehouseRepository.update(idWarehouse, {
-      actionWhenLimit: value,
-    });
+  ): Promise<Warehouse> {
+
+    let wh = await this.warehouseRepository.findOneOrFail(idWarehouse);
+    wh.actionWhenLimit = value;
+    return await this.warehouseRepository.save(wh);
   }
 }
