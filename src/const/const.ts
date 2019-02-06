@@ -5,4 +5,5 @@ export const CONSTANTS = {
 export const MESSAGES = {
     ALL_WAREHOUSES_COMPLETED: 'warehouses are complete',
     WAREHOUSE_IS_OCCUPIED: 'warehouse is 95% occupied, it  will delayed delivery',
+    DISTANCE_SERVICE_ERROR: 'Error distanceService',
 };

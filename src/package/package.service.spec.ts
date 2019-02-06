@@ -10,53 +10,46 @@ import { Customer } from '../models/customer.entity';
 import { WarehouseDTO } from './../dtos/warehouse.dto';
 import { CustomerDTO } from './../dtos/customer.dto';
 
-import {
-  distanServiceMock,
-  warehouseRepositoryMock,
-  packagesRepository,
-} from './../mocks/mocks';
 
 describe('PackageService', async () => {
-  let m: TestingModule;
+  let modulePackages: TestingModule;
   let warehouseService: WarehouseService;
   let packageRespository: Repository<Package>;
   let packageService: PackageService;
 
   beforeEach(async () => {
-    m = await Test.createTestingModule({
+    modulePackages = await Test.createTestingModule({
       providers: [
         {
           provide: getRepositoryToken(Package),
-          useValue: packagesRepository,
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(Warehouse),
-          useValue: warehouseRepositoryMock,
+          useClass: Repository,
         },
-        {
-          provide: DistanceService,
-          useValue: distanServiceMock,
-        },
+        DistanceService,
         WarehouseService,
         PackageService,
       ],
       imports: [],
     }).compile();
 
-    warehouseService = m.get<WarehouseService>(WarehouseService);
-    packageRespository = m.get<Repository<Package>>(
+    warehouseService = modulePackages.get<WarehouseService>(WarehouseService);
+    packageRespository = modulePackages.get<Repository<Package>>(
       getRepositoryToken(Package),
     );
-    packageService = m.get<PackageService>(PackageService);
+    packageService = modulePackages.get<PackageService>(PackageService);
   });
 
   describe('savePackage', () => {
-    it('should save a new package', async () => {
+    it('should save a new package', async (done) => {
       const nearestWarehouse = Object.assign(new Warehouse(), {
         id: 1,
         name: 'WH01',
         city: 'Buenos Aires',
-        maxLimit: 70,
+        maxLimit: 100,
+        maxOccupied: 95,
         action: 'ACCEPT',
         packages: [],
       });
@@ -73,6 +66,8 @@ describe('PackageService', async () => {
           email: 'renzo.h.coronel@gmail.com',
         }),
         to: 'Avellaneda',
+        amount: 100.0,
+        dateOfDelivery: '2019-02-06',
         warehouse: Object.assign(new Warehouse(), {
           id: 1,
           name: 'WH01',
@@ -93,6 +88,8 @@ describe('PackageService', async () => {
         }),
         from: 'Cordoba',
         to: 'Avellaneda',
+        amount: null,
+        dateOfDelivery: null,
         warehouse: new WarehouseDTO(),
         status: null,
       };
@@ -109,6 +106,8 @@ describe('PackageService', async () => {
         }),
         from: 'Cordoba',
         to: 'Avellaneda',
+        amount: 100.0,
+        dateOfDelivery: '2019-02-06',
         warehouse: Object.assign(new WarehouseDTO(), {
           id: 1,
           city: 'Buenos Aires',
@@ -121,9 +120,11 @@ describe('PackageService', async () => {
 
       packageRespository.save = jest.fn(() => packageSaved);
       packageRespository.create = jest.fn(() => new Customer());
-      expect(await packageService.savePackage(packageDTO)).toEqual(
+
+      expect(packageService.savePackage(packageDTO)).resolves.toEqual(
         packageDTOSend,
       );
+      done();
     });
 
   });

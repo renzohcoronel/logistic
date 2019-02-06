@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistanceService } from './distanceGoogle.service';
 import { Warehouse, Action } from '../models/warehouse.entity';
-import { MESSAGES } from './../const/const';
+import { MESSAGES, CONSTANTS } from './../const/const';
 
 @Injectable()
 export class WarehouseService {
@@ -35,7 +35,9 @@ export class WarehouseService {
           })
           .catch(err => {
             this.logger.log(err.error_message);
-            reject(err);
+            reject({
+              message: MESSAGES.DISTANCE_SERVICE_ERROR,
+            });
           });
       });
 

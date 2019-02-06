@@ -1,6 +1,6 @@
 import { WarehouseDTO } from './warehouse.dto';
 import { CustomerDTO } from './customer.dto';
-import { IsString} from 'class-validator';
+import { IsString } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
 export enum Status {
@@ -9,6 +9,8 @@ export enum Status {
 }
 
 export class PackageDTO {
+  constructor() {}
+
   @ApiModelProperty({ example: null })
   id: number;
   @ApiModelProperty()

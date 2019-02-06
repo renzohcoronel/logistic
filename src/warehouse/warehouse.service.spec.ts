@@ -1,59 +1,44 @@
 import { DistanceService } from './distanceGoogle.service';
 import { WarehouseService } from './warehouse.service';
 import { Repository } from 'typeorm';
-import { Test, TestingModuleBuilder, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Warehouse, Action } from '../models/warehouse.entity';
-import { distanServiceMock, warehouseRepositoryMock } from './../mocks/mocks';
+import { Package } from '../models/package.entity';
+import { CONSTANTS, MESSAGES } from '../const/const';
 
 describe('WarehouseService', async () => {
-  let m: TestingModule;
+  let warehouseModule: TestingModule;
   let warehouseService: WarehouseService;
-  let warehousesRepository: Repository<Warehouse>;
   let distanceService: DistanceService;
+  let warehouseRepository: Repository<Warehouse>;
 
   beforeEach(async () => {
-    m = await Test.createTestingModule({
+    warehouseModule = await Test.createTestingModule({
       providers: [
         {
           provide: getRepositoryToken(Warehouse),
-          useValue: warehouseRepositoryMock,
+          useClass: Repository,
         },
-        {
-          provide: DistanceService,
-          useValue: distanServiceMock,
-        },
-
+        DistanceService,
         WarehouseService,
       ],
     }).compile();
 
-    warehouseService = await m.get<WarehouseService>(WarehouseService);
-    warehousesRepository = await m.get<Repository<Warehouse>>(
+    warehouseService = await warehouseModule.get<WarehouseService>(
+      WarehouseService,
+    );
+    distanceService = await warehouseModule.get<DistanceService>(
+      DistanceService,
+    );
+    warehouseRepository = await warehouseModule.get<Repository<Warehouse>>(
       getRepositoryToken(Warehouse),
     );
-    distanceService = await m.get<DistanceService>(DistanceService);
   });
 
   describe('getNearestWarehouse', () => {
-    it('should return an object of warehouse ', async (done) => {
-      const result = {
-        id: 2,
-        name: 'WH02',
-        city: 'Buenos Aires',
-        maxLimit: 100,
-        action: 'ACCEPT',
-        packages: [],
-      };
-
-      expect(warehouseService.getNearestWarehouse('Avellaneda')).resolves.toBe(
-        result,
-      );
-      done();
-    });
-
-    it('nearest', async (done) => {
-      warehousesRepository.find = jest.fn(
+    it('should return an object of warehouse ', async done => {
+      warehouseRepository.find = jest.fn(
         async () =>
           await [
             {
@@ -61,30 +46,83 @@ describe('WarehouseService', async () => {
               name: 'WH01',
               city: 'Buenos Aires',
               maxLimit: 21,
-              action: Action.NARBY_NEXT_WAREHOUSE,
-              packages: new Array(20),
+              maxOccupied: 95,
+              action: Action.ACCEPT,
+              packages: [],
             },
             {
               id: 2,
               name: 'WH02',
               city: 'Rosario',
               maxLimit: 10,
+              maxOccupied: 95,
               action: Action.ACCEPT,
               packages: [],
             },
           ],
       );
 
-      distanceService.getDistance = jest
-        .fn()
-        .mockResolvedValue(1)
-        .mockResolvedValueOnce(10);
+      distanceService.getDistance = jest.fn().mockResolvedValue({
+        duration: 100,
+        distance: 7093,
+      });
+
+      const result = {
+        id: 1,
+        name: 'WH01',
+        city: 'Buenos Aires',
+        maxLimit: 21,
+        maxOccupied: 95,
+        duration: 100,
+        distance: 7093,
+        action: Action.ACCEPT,
+        packages: [],
+      };
+
+      expect(warehouseService.getNearestWarehouse('Avellaneda'))
+        .resolves.toEqual(result)
+        ;
+      done();
+    });
+
+    it('nearest', async done => {
+      warehouseRepository.find = jest.fn(
+        async (...args) =>
+          await [
+            {
+              id: 1,
+              name: 'WH01',
+              city: 'Buenos Aires',
+              maxLimit: 21,
+              maxOccupied: 95,
+              action: Action.NARBY_NEXT_WAREHOUSE,
+              packages: new Array<Package>(20),
+            },
+            {
+              id: 2,
+              name: 'WH02',
+              city: 'Rosario',
+              maxLimit: 10,
+              maxOccupied: 95,
+              action: Action.ACCEPT,
+              packages: [],
+            },
+          ],
+      );
+
+      distanceService.getDistance = jest.fn().mockResolvedValue({
+        duration: 100,
+        distance: 7093,
+      });
 
       const result = {
         id: 2,
         name: 'WH02',
         city: 'Rosario',
         maxLimit: 10,
+        maxOccupied: 95,
+        duration: 100,
+        distance: 7093,
         action: Action.ACCEPT,
         packages: [],
       };
@@ -92,11 +130,15 @@ describe('WarehouseService', async () => {
       expect(
         warehouseService.getNearestWarehouse('Avellaneda'),
       ).resolves.toEqual(result);
+      expect(warehouseRepository.find).toBeCalledTimes(1);
+      expect(warehouseRepository.find).toBeCalledWith({
+        relations: ['packages'],
+      });
       done();
     });
 
     it('exception from distanceService', async (done) => {
-      warehousesRepository.find = jest.fn(
+      warehouseRepository.find = jest.fn(
         async () =>
           await [
             {
@@ -104,49 +146,16 @@ describe('WarehouseService', async () => {
               name: 'WH01',
               city: 'Buenos Aires',
               maxLimit: 21,
+              maxOccupied: 95,
               action: Action.ACCEPT,
-              packages: new Array(1),
+              packages: [],
             },
             {
               id: 2,
               name: 'WH02',
               city: 'Rosario',
-              maxLimit: 2,
-              action: Action.ACCEPT,
-              packages: new Array(1),
-            },
-          ],
-      );
-
-      distanceService.getDistance = jest
-        .fn()
-        .mockResolvedValue(1)
-        .mockRejectedValue('');
-
-      expect(warehouseService.getNearestWarehouse('Avellaneda')).rejects.toBe(
-        '',
-      );
-
-      done();
-    });
-
-    it('delayed', async (done) => {
-      warehousesRepository.find = jest.fn(
-        async () =>
-          await [
-            {
-              id: 1,
-              name: 'WH01',
-              city: 'Buenos Aires',
-              maxLimit: 21,
-              action: Action.ACCEPT_DELAYED,
-              packages: new Array(20),
-            },
-            {
-              id: 2,
-              name: 'WH02',
-              city: 'Rosario',
-              maxLimit: 2,
+              maxLimit: 10,
+              maxOccupied: 95,
               action: Action.ACCEPT,
               packages: [],
             },
@@ -154,15 +163,53 @@ describe('WarehouseService', async () => {
       );
 
       distanceService.getDistance = jest
-        .fn()
-        .mockResolvedValue(1)
-        .mockResolvedValueOnce(10);
+      .fn().mockRejectedValue({});
+
+      expect(warehouseService.getNearestWarehouse('Avellaneda')).rejects.toEqual(
+        { message: MESSAGES.DISTANCE_SERVICE_ERROR},
+      );
+
+      done();
+    });
+
+    it('delayed', async (done) => {
+      warehouseRepository.find = jest.fn(
+        async () =>
+          await [
+            {
+              id: 1,
+              name: 'WH01',
+              city: 'Buenos Aires',
+              maxLimit: 21,
+              maxOccupied: 95,
+              action: Action.ACCEPT_DELAYED,
+              packages: new Array<Package>(20),
+            },
+            {
+              id: 2,
+              name: 'WH02',
+              city: 'Rosario',
+              maxLimit: 2,
+              maxOccupied: 95,
+              action: Action.ACCEPT,
+              packages: [],
+            },
+          ],
+      );
+
+      distanceService.getDistance = jest.fn().mockResolvedValue({
+        duration: 100,
+        distance: 7093,
+      });
 
       const result = {
         id: 1,
         name: 'WH01',
         city: 'Buenos Aires',
         maxLimit: 21,
+        maxOccupied: 95,
+        duration: 100,
+        distance: 7093,
         action: Action.ACCEPT_DELAYED,
         packages: new Array(20),
       };
@@ -174,7 +221,7 @@ describe('WarehouseService', async () => {
     });
 
     it('its 95% occupped', async (done) => {
-      warehousesRepository.find = jest.fn(
+      warehouseRepository.find = jest.fn(
         async () =>
           await [
             {
@@ -182,13 +229,17 @@ describe('WarehouseService', async () => {
               name: 'WH01',
               city: 'Buenos Aires',
               maxLimit: 21,
+              maxOccupied: 95,
               action: Action.ACCEPT,
               packages: new Array(20),
             },
           ],
       );
 
-      distanceService.getDistance = jest.fn().mockResolvedValue(1);
+      distanceService.getDistance = jest.fn().mockResolvedValue({
+        duration: 100,
+        distance: 7093,
+      });
 
       expect(
         warehouseService.getNearestWarehouse('Avellaneda'),
@@ -196,46 +247,46 @@ describe('WarehouseService', async () => {
         id: 1,
         name: 'WH01',
         city: 'Buenos Aires',
-        message: 'warehouse is 95% occupied, it  will delayed delivery',
+        message: MESSAGES.WAREHOUSE_IS_OCCUPIED,
       });
       done();
     });
 
     it('update warehouse params action', async (done) => {
-      warehousesRepository.findOneOrFail = jest.fn(async () => {
-        const wh = new Warehouse();
-        wh.id = 1;
-        wh.name = 'WH01';
-        wh.city = 'Buenos Aires';
-        wh.maxLimit = 100;
-        wh.action = Action.ACCEPT;
-        return wh;
+      warehouseRepository.findOneOrFail = jest.fn(async () => {
+        const warehouse = new Warehouse();
+        warehouse.id = 1;
+        warehouse.name = 'WH01';
+        warehouse.city = 'Buenos Aires';
+        warehouse.maxLimit = 100;
+        warehouse.action = Action.ACCEPT;
+        return await warehouse;
       });
 
-      warehousesRepository.save = jest.fn(async () => {
-        const wh = new Warehouse();
-        wh.id = 1;
-        wh.name = 'WH01';
-        wh.city = 'Buenos Aires';
-        wh.maxLimit = 100;
-        wh.action = Action.ACCEPT_DELAYED;
-        return wh;
+      warehouseRepository.save = jest.fn(async () => {
+        const warehouse = new Warehouse();
+        warehouse.id = 1;
+        warehouse.name = 'WH01';
+        warehouse.city = 'Buenos Aires';
+        warehouse.maxLimit = 100;
+        warehouse.action = Action.ACCEPT_DELAYED;
+        return await warehouse;
       });
 
-      const whModified = new Warehouse();
-      whModified.id = 1;
-      whModified.name = 'WH01';
-      whModified.city = 'Buenos Aires';
-      whModified.maxLimit = 100;
-      whModified.action = Action.ACCEPT_DELAYED;
+      const warehouseModified = new Warehouse();
+      warehouseModified.id = 1;
+      warehouseModified.name = 'WH01';
+      warehouseModified.city = 'Buenos Aires';
+      warehouseModified.maxLimit = 100;
+      warehouseModified.action = Action.ACCEPT_DELAYED;
 
       expect(
         warehouseService.changeWarehouseAction(
           1,
           Action.ACCEPT_DELAYED,
-        ),
-      ).resolves.toEqual(whModified);
+        )).resolves.toEqual(warehouseModified);
       done();
     });
+
   });
 });

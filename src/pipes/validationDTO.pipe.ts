@@ -9,14 +9,17 @@ import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ValidationDTO implements PipeTransform<any> {
+  constructor() {}
+
   async transform(value, { metatype }: ArgumentMetadata) {
+
     if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
     const object = plainToClass(metatype, value);
     const errors = await validate(object);
     if (errors.length > 0) {
-      throw new BadRequestException('Validation failed');
+      throw new BadRequestException('Validation failed' + errors);
     }
     return value;
   }

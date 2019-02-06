@@ -35,11 +35,11 @@ export class WarehouseController {
     return new Promise<WarehouseDTO>((resolve, reject) =>
       this.serviceWarehouse
         .changeWarehouseAction(params.id, query.actionLimit)
-        .then(wh => {
+        .then(({id, city, name}) => {
           const whDto = new WarehouseDTO();
-          whDto.id = wh.id;
-          whDto.city = wh.city;
-          whDto.name = wh.name;
+          whDto.id = id;
+          whDto.city = city;
+          whDto.name = name;
 
           this.logger.log(`Updated warehouse ${whDto.name}`);
 
