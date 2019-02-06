@@ -3,7 +3,7 @@ import { WarehouseService } from './warehouse.service';
 import { Repository } from 'typeorm';
 import { Test, TestingModuleBuilder, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Warehouse, ActionWhenLimit } from '../models/warehouse.entity';
+import { Warehouse, Action } from '../models/warehouse.entity';
 import { distanServiceMock, warehouseRepositoryMock } from './../mocks/mocks';
 
 describe('WarehouseService', async () => {
@@ -36,22 +36,23 @@ describe('WarehouseService', async () => {
   });
 
   describe('getNearestWarehouse', () => {
-    it('should return an object of warehouse ', async () => {
+    it('should return an object of warehouse ', async (done) => {
       const result = {
         id: 2,
         name: 'WH02',
         city: 'Buenos Aires',
         maxLimit: 100,
-        actionWhenLimit: 'ACCEPT',
+        action: 'ACCEPT',
         packages: [],
       };
 
       expect(warehouseService.getNearestWarehouse('Avellaneda')).resolves.toBe(
         result,
       );
+      done();
     });
 
-    it('nearest', async () => {
+    it('nearest', async (done) => {
       warehousesRepository.find = jest.fn(
         async () =>
           await [
@@ -60,7 +61,7 @@ describe('WarehouseService', async () => {
               name: 'WH01',
               city: 'Buenos Aires',
               maxLimit: 21,
-              actionWhenLimit: ActionWhenLimit.NARBY_NEXT_WAREHOUSE,
+              action: Action.NARBY_NEXT_WAREHOUSE,
               packages: new Array(20),
             },
             {
@@ -68,7 +69,7 @@ describe('WarehouseService', async () => {
               name: 'WH02',
               city: 'Rosario',
               maxLimit: 10,
-              actionWhenLimit: ActionWhenLimit.ACCEPT,
+              action: Action.ACCEPT,
               packages: [],
             },
           ],
@@ -84,16 +85,17 @@ describe('WarehouseService', async () => {
         name: 'WH02',
         city: 'Rosario',
         maxLimit: 10,
-        actionWhenLimit: ActionWhenLimit.ACCEPT,
+        action: Action.ACCEPT,
         packages: [],
       };
 
       expect(
         warehouseService.getNearestWarehouse('Avellaneda'),
       ).resolves.toEqual(result);
+      done();
     });
 
-    it('exception from distanceService', async () => {
+    it('exception from distanceService', async (done) => {
       warehousesRepository.find = jest.fn(
         async () =>
           await [
@@ -102,7 +104,7 @@ describe('WarehouseService', async () => {
               name: 'WH01',
               city: 'Buenos Aires',
               maxLimit: 21,
-              actionWhenLimit: ActionWhenLimit.ACCEPT,
+              action: Action.ACCEPT,
               packages: new Array(1),
             },
             {
@@ -110,7 +112,7 @@ describe('WarehouseService', async () => {
               name: 'WH02',
               city: 'Rosario',
               maxLimit: 2,
-              actionWhenLimit: ActionWhenLimit.ACCEPT,
+              action: Action.ACCEPT,
               packages: new Array(1),
             },
           ],
@@ -124,9 +126,11 @@ describe('WarehouseService', async () => {
       expect(warehouseService.getNearestWarehouse('Avellaneda')).rejects.toBe(
         '',
       );
+
+      done();
     });
 
-    it('delayed', async () => {
+    it('delayed', async (done) => {
       warehousesRepository.find = jest.fn(
         async () =>
           await [
@@ -135,7 +139,7 @@ describe('WarehouseService', async () => {
               name: 'WH01',
               city: 'Buenos Aires',
               maxLimit: 21,
-              actionWhenLimit: ActionWhenLimit.ACCEPT_DELAYED,
+              action: Action.ACCEPT_DELAYED,
               packages: new Array(20),
             },
             {
@@ -143,7 +147,7 @@ describe('WarehouseService', async () => {
               name: 'WH02',
               city: 'Rosario',
               maxLimit: 2,
-              actionWhenLimit: ActionWhenLimit.ACCEPT,
+              action: Action.ACCEPT,
               packages: [],
             },
           ],
@@ -159,16 +163,17 @@ describe('WarehouseService', async () => {
         name: 'WH01',
         city: 'Buenos Aires',
         maxLimit: 21,
-        actionWhenLimit: ActionWhenLimit.ACCEPT_DELAYED,
+        action: Action.ACCEPT_DELAYED,
         packages: new Array(20),
       };
 
       expect(
         warehouseService.getNearestWarehouse('Avellaneda'),
       ).resolves.toEqual(result);
+      done();
     });
 
-    it('its 95% occupped', async () => {
+    it('its 95% occupped', async (done) => {
       warehousesRepository.find = jest.fn(
         async () =>
           await [
@@ -177,7 +182,7 @@ describe('WarehouseService', async () => {
               name: 'WH01',
               city: 'Buenos Aires',
               maxLimit: 21,
-              actionWhenLimit: ActionWhenLimit.ACCEPT,
+              action: Action.ACCEPT,
               packages: new Array(20),
             },
           ],
@@ -193,16 +198,17 @@ describe('WarehouseService', async () => {
         city: 'Buenos Aires',
         message: 'warehouse is 95% occupied, it  will delayed delivery',
       });
+      done();
     });
 
-    it('update warehouse params actionWhenLimit', async () => {
+    it('update warehouse params action', async (done) => {
       warehousesRepository.findOneOrFail = jest.fn(async () => {
         const wh = new Warehouse();
         wh.id = 1;
         wh.name = 'WH01';
         wh.city = 'Buenos Aires';
         wh.maxLimit = 100;
-        wh.actionWhenLimit = ActionWhenLimit.ACCEPT;
+        wh.action = Action.ACCEPT;
         return wh;
       });
 
@@ -212,7 +218,7 @@ describe('WarehouseService', async () => {
         wh.name = 'WH01';
         wh.city = 'Buenos Aires';
         wh.maxLimit = 100;
-        wh.actionWhenLimit = ActionWhenLimit.ACCEPT_DELAYED;
+        wh.action = Action.ACCEPT_DELAYED;
         return wh;
       });
 
@@ -221,14 +227,15 @@ describe('WarehouseService', async () => {
       whModified.name = 'WH01';
       whModified.city = 'Buenos Aires';
       whModified.maxLimit = 100;
-      whModified.actionWhenLimit = ActionWhenLimit.ACCEPT_DELAYED;
+      whModified.action = Action.ACCEPT_DELAYED;
 
       expect(
-        warehouseService.changeWarehouseActionLimit(
+        warehouseService.changeWarehouseAction(
           1,
-          ActionWhenLimit.ACCEPT_DELAYED,
+          Action.ACCEPT_DELAYED,
         ),
       ).resolves.toEqual(whModified);
+      done();
     });
   });
 });

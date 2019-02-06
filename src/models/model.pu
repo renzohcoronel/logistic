@@ -6,16 +6,18 @@ class Package {
     customer: Customer
     from: String
     to: String
+    amount: Number
+    dateOfDelivery: Date
 }
 
 class Warehouse {
     name:String
     city: String
     maxLimit: Number
+    maxOccupied: Number
 }
 
 class Customer {
-
     name: String 
     surname: String 
     adress: String 

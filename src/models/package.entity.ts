@@ -3,8 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Warehouse } from './warehouse.entity';
 import { Customer } from './customer.entity';
@@ -24,6 +22,12 @@ export class Package {
 
   @Column()
   to: string;
+
+  @Column()
+  amount: number;
+
+  @Column({ type: 'datetime', nullable: true })
+  dateOfDelivery: Date;
 
   @ManyToOne(type => Customer, customer => customer.packages)
   customer: Customer;

@@ -34,7 +34,7 @@ export class WarehouseController {
   async updateWarehouseActionLimit(@Param() params, @Query() query) {
     return new Promise<WarehouseDTO>((resolve, reject) =>
       this.serviceWarehouse
-        .changeWarehouseActionLimit(params.id, query.actionLimit)
+        .changeWarehouseAction(params.id, query.actionLimit)
         .then(wh => {
           const whDto = new WarehouseDTO();
           whDto.id = wh.id;

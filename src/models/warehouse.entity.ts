@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Package } from './package.entity';
 
-export enum ActionWhenLimit {
+export enum Action {
   ACCEPT = 'ACCEPT',
   ACCEPT_DELAYED = 'ACCEPT_DELAYED',
   NARBY_NEXT_WAREHOUSE = 'NARBY_NEXT_WAREHOUSE',
@@ -21,8 +21,11 @@ export class Warehouse {
   @Column('int')
   maxLimit: number;
 
-  @Column('enum', { enum: ActionWhenLimit })
-  actionWhenLimit: ActionWhenLimit;
+  @Column('int')
+  maxOccupied: number;
+
+  @Column('enum', { enum: Action })
+  action: Action;
 
   @OneToMany(type => Package, _package => _package.warehouse)
   packages: Package[];

@@ -1,7 +1,7 @@
-import { Test, TestingModuleBuilder, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Package, Status } from './../models/package.entity';
-import { Warehouse, ActionWhenLimit } from '../models/warehouse.entity';
+import { Warehouse} from '../models/warehouse.entity';
 import { WarehouseService } from './../warehouse/warehouse.service';
 import { PackageService } from './../package/package.service';
 import { Repository } from 'typeorm';
@@ -9,14 +9,12 @@ import { DistanceService } from '../warehouse/distanceGoogle.service';
 import { Customer } from '../models/customer.entity';
 import { WarehouseDTO } from './../dtos/warehouse.dto';
 import { CustomerDTO } from './../dtos/customer.dto';
-import { async } from 'rxjs/internal/scheduler/async';
 
 import {
   distanServiceMock,
   warehouseRepositoryMock,
   packagesRepository,
 } from './../mocks/mocks';
-import { Stats } from 'fs';
 
 describe('PackageService', async () => {
   let m: TestingModule;
@@ -59,7 +57,7 @@ describe('PackageService', async () => {
         name: 'WH01',
         city: 'Buenos Aires',
         maxLimit: 70,
-        actionWhenLimit: 'ACCEPT',
+        action: 'ACCEPT',
         packages: [],
       });
 
@@ -127,5 +125,6 @@ describe('PackageService', async () => {
         packageDTOSend,
       );
     });
+
   });
 });

@@ -28,6 +28,7 @@
     "class-validator": "^0.9.1",
     "dotenv": "^6.2.0",
     "google-distance-matrix": "^1.1.1",
+    "moment": "^2.24.0",
     "mysql": "^2.16.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.2.2",

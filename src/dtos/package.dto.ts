@@ -1,7 +1,8 @@
 import { WarehouseDTO } from './warehouse.dto';
 import { CustomerDTO } from './customer.dto';
-import { IsString, IsInt } from 'class-validator';
+import { IsString, IsNumber, IsDate, ValidateIf } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
+
 
 export enum Status {
   RECEIVED = 'RECEIVED',
@@ -19,6 +20,10 @@ export class PackageDTO {
   @ApiModelProperty({ example: 'Avellaneda' })
   @IsString()
   to: string;
+  @ApiModelProperty()
+  amount: number;
+  @ApiModelProperty()
+  dateOfDelivery: Date;
   @ApiModelProperty({ required: false, example: {} })
   warehouse: WarehouseDTO;
   @ApiModelProperty({ required: false, example: '' })

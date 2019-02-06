@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistanceService } from './distanceGoogle.service';
-import { Warehouse, ActionWhenLimit } from '../models/warehouse.entity';
+import { Warehouse, Action } from '../models/warehouse.entity';
 
 @Injectable()
 export class WarehouseService {
@@ -24,9 +24,13 @@ export class WarehouseService {
       const warehousePromise = warehouses.map(async wh => {
         await this.distanceService
           .getDistance([wh.city], [to.toString()])
-          .then(value => {
-            this.logger.log(` ${wh.city} - ${to} Distance: ${value}`);
-            warehouseDistances.push({ warehouse: wh, distance: value });
+          .then(({ distance, duration }) => {
+            this.logger.log(
+              ` ${wh.city} - ${to} Distance: ${distance} Duration: ${duration}`,
+            );
+            if (!(distance === undefined || duration === undefined)){
+              warehouseDistances.push({ ...wh, distance, duration });
+            }
           })
           .catch(err => {
             this.logger.log(err.error_message);
@@ -38,36 +42,30 @@ export class WarehouseService {
 
       // search nearest warehouse
       const result = warehouseDistances.sort((prev, curr) => {
-        return prev.distance < curr.distance ? prev : curr;
+        this.logger.log(`${prev.distance} - ${curr.distance}`);
+        return prev.distance - curr.distance;
       });
 
       /**
        * if a warehouse reaches the limit, search the next nearest warehouse
        */
+      result.forEach(warehouse => {
+        const percentageOccupied =
+          (warehouse.packages.length * 100) / warehouse.maxLimit;
 
-      result.forEach(wh => {
-        const whSelected = wh.warehouse;
-        const percentage =
-          (whSelected.packages.length * 100) / whSelected.maxLimit;
-        this.logger.log(
-          ` Warehouse ${whSelected.name} Occupied %${percentage}`,
-        );
-
-        if (whSelected.packages.length <= whSelected.maxLimit) {
-          if (percentage < 95) {
-            resolve(whSelected);
-          } else if (
-            whSelected.actionWhenLimit === ActionWhenLimit.ACCEPT_DELAYED
-          ) {
-            resolve(whSelected);
-          } else if (
-            whSelected.actionWhenLimit === ActionWhenLimit.NARBY_NEXT_WAREHOUSE
-          ) {
+        if (warehouse.packages.length <= warehouse.maxLimit) {
+          if (percentageOccupied < warehouse.maxOccupied) {
+            resolve(warehouse);
+          } else if (warehouse.action === Action.ACCEPT_DELAYED) {
+            resolve(warehouse);
+          } else if (warehouse.action === Action.NARBY_NEXT_WAREHOUSE) {
+            /* dejo seguir el bucle para el proximo elemento.
+             */
           } else {
             reject({
-              id: whSelected.id,
-              name: whSelected.name,
-              city: whSelected.city,
+              id: warehouse.id,
+              name: warehouse.name,
+              city: warehouse.city,
               message: 'warehouse is 95% occupied, it  will delayed delivery',
             });
           }
@@ -81,12 +79,9 @@ export class WarehouseService {
     });
   }
 
-  async changeWarehouseActionLimit(
-    idWarehouse,
-    value: ActionWhenLimit,
-  ): Promise<Warehouse> {
+  async changeWarehouseAction(idWarehouse, value: Action): Promise<Warehouse> {
     const wh = await this.warehouseRepository.findOneOrFail(idWarehouse);
-    wh.actionWhenLimit = value;
+    wh.action = value;
     return await this.warehouseRepository.save(wh);
   }
 }

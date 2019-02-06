@@ -21,12 +21,15 @@ export class DistanceService {
         }
         if (distances.status === 'OK') {
           if (distances.rows[0].elements[0].status === 'OK') {
-            resolve(distances.rows[0].elements[0].distance.value);
+            resolve({
+              distance: distances.rows[0].elements[0].distance.value,
+              duration: distances.rows[0].elements[0].duration.value,
+            });
           } else {
-            resolve(null);
+            resolve({});
           }
         } else {
-          resolve(null);
+          resolve({});
         }
       });
     });

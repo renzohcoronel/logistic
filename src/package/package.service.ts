@@ -1,17 +1,16 @@
 import {
   Injectable,
-  UseInterceptors,
-  ClassSerializerInterceptor,
-  ConflictException,
   Logger,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Warehouse } from './../models/warehouse.entity';
+import * as moment from 'moment';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Package, Status } from './../models/package.entity';
 import { PackageDTO } from './../dtos/package.dto';
 import { WarehouseService } from './../warehouse/warehouse.service';
 import { Customer } from './../models/customer.entity';
+import { Action } from './../models/warehouse.entity';
+
 
 @Injectable()
 export class PackageService {
@@ -25,15 +24,30 @@ export class PackageService {
 
   async savePackage(packageDto: PackageDTO): Promise<PackageDTO> {
     return new Promise<PackageDTO>(async (resolve, rejected) => {
-      let wh = null;
+      let nearbyWarehouse = null;
+
+      const { from, to, customer } = packageDto;
+
       try {
-        wh = await this.warehouseService.getNearestWarehouse(packageDto.to);
+        nearbyWarehouse = await this.warehouseService.getNearestWarehouse(
+          packageDto.to,
+        );
+
         let newPackage = this.packageRespository.create();
-        newPackage.from = packageDto.from;
+        newPackage.from = from;
         newPackage.customer = new Customer();
-        newPackage.customer.id = packageDto.customer.id;
-        newPackage.to = packageDto.to;
-        newPackage.warehouse = wh ? wh : null;
+        newPackage.customer.id = customer.id;
+        newPackage.to = to;
+
+        newPackage.amount = Math.floor(nearbyWarehouse.distance / 5000); // distance(m)/ (cost for 5k m) * price (for 5k)
+
+        if (nearbyWarehouse.action === Action.ACCEPT_DELAYED){
+          newPackage.dateOfDelivery = moment(new Date()).add( nearbyWarehouse.duration, 'seconds').add(1 , 'days').toDate();
+        } else {
+          newPackage.dateOfDelivery = moment(new Date()).add( nearbyWarehouse.duration, 'seconds').toDate();
+        }
+
+        newPackage.warehouse = nearbyWarehouse;
         newPackage.status = Status.RECEIVED;
 
         newPackage = await this.packageRespository.save(newPackage);
@@ -44,6 +58,8 @@ export class PackageService {
         packageDto.warehouse.id = newPackage.warehouse.id;
         packageDto.warehouse.city = newPackage.warehouse.city;
         packageDto.warehouse.name = newPackage.warehouse.name;
+        packageDto.amount = newPackage.amount;
+        packageDto.dateOfDelivery = newPackage.dateOfDelivery;
         packageDto.status = newPackage.status;
 
         resolve(packageDto);
