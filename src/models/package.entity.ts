@@ -26,7 +26,7 @@ export class Package {
   @Column()
   amount: number;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'date', nullable: true })
   dateOfDelivery: Date;
 
   @ManyToOne(type => Customer, customer => customer.packages)

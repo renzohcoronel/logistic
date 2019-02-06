@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistanceService } from './distanceGoogle.service';
 import { Warehouse, Action } from '../models/warehouse.entity';
+import { MESSAGES } from './../const/const';
 
 @Injectable()
 export class WarehouseService {
@@ -42,7 +43,6 @@ export class WarehouseService {
 
       // search nearest warehouse
       const result = warehouseDistances.sort((prev, curr) => {
-        this.logger.log(`${prev.distance} - ${curr.distance}`);
         return prev.distance - curr.distance;
       });
 
@@ -66,7 +66,7 @@ export class WarehouseService {
               id: warehouse.id,
               name: warehouse.name,
               city: warehouse.city,
-              message: 'warehouse is 95% occupied, it  will delayed delivery',
+              message: MESSAGES.WAREHOUSE_IS_OCCUPIED,
             });
           }
         }
@@ -74,7 +74,7 @@ export class WarehouseService {
 
       // if all warehouses are complete
       reject({
-        message: 'warehouses are complete',
+        message: MESSAGES.ALL_WAREHOUSES_COMPLETED,
       });
     });
   }
