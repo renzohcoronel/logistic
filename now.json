@@ -1,5 +1,23 @@
 {
-    "version": 2,
-    "name": "logistic",
-    "builds": [{ "use": "@now/node" }]
+  "version": 2,
+  "name": "logistic",
+  "builds": [
+    {
+      "src": "dist/**/*.js",
+      "use": "@now/node",
+      "config": { "maxLambdaSize": "15mb" } 
+    }
+  ],
+  "env": {
+    "ENVIRONMENT": "DEV",
+
+    "DB_HOST": "sql10.freemysqlhosting.net",
+    "DB_PORT": "3306",
+    "DB_USERNAME": "sql10276714",
+    "DB_PASSWORD": "qkCXjJbaAX",
+    "DB_NAME": "sql10276714",
+    "DB_SYNC": "true",
+
+    "GOOGLE_CLIENT_KEY": "AIzaSyAXNSazqltpdvOSDrbHN6xG2BjoG8ySb9k"
   }
+}

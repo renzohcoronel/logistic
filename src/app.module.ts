@@ -4,6 +4,9 @@ import { PackagesModule } from './package/package.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationDTO } from './pipes/validationDTO.pipe';
 import { WarehouseModule } from './warehouse/warehouse.module';
+import { Warehouse } from './models/warehouse.entity';
+import { Customer } from './models/customer.entity';
+import { Package } from './models/package.entity';
 
 @Module({
   imports: [
@@ -14,7 +17,7 @@ import { WarehouseModule } from './warehouse/warehouse.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [Warehouse, Customer, Package],
       synchronize: true,
     }),
     PackagesModule,
