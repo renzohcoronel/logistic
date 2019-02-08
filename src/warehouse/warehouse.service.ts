@@ -22,15 +22,15 @@ export class WarehouseService {
       });
       const warehouseDistances = [];
 
-      const warehousePromise = warehouses.map(async wh => {
+      const warehousePromise = warehouses.map(async warehouse => {
         await this.distanceService
-          .getDistance([wh.city], [to.toString()])
+          .getDistance([warehouse.city], [to.toString()])
           .then(({ distance, duration }) => {
             this.logger.log(
-              ` ${wh.city} - ${to} Distance: ${distance} Duration: ${duration}`,
+              ` ${warehouse.city} - ${to} Distance: ${distance} Duration: ${duration}`,
             );
             if (!(distance === undefined || duration === undefined)){
-              warehouseDistances.push({ ...wh, distance, duration });
+              warehouseDistances.push({ ...warehouse, distance, duration });
             }
           })
           .catch(err => {
@@ -61,7 +61,7 @@ export class WarehouseService {
           } else if (warehouse.action === Action.ACCEPT_DELAYED) {
             resolve(warehouse);
           } else if (warehouse.action === Action.NARBY_NEXT_WAREHOUSE) {
-            /* dejo seguir el bucle para el proximo elemento.
+            /* the warehouse not accept more package. Search the next warehouse
              */
           } else {
             reject({

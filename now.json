@@ -11,11 +11,11 @@
   "env": {
     "ENVIRONMENT": "DEV",
 
-    "DB_HOST": "sql10.freemysqlhosting.net",
+    "DB_HOST": "remotemysql.com",
     "DB_PORT": "3306",
-    "DB_USERNAME": "sql10276714",
-    "DB_PASSWORD": "qkCXjJbaAX",
-    "DB_NAME": "sql10276714",
+    "DB_USERNAME": "DAu8G4ELvX",
+    "DB_PASSWORD": "CuussOR2a3",
+    "DB_NAME": "DAu8G4ELvX",
     "DB_SYNC": "true",
 
     "GOOGLE_CLIENT_KEY": "AIzaSyAXNSazqltpdvOSDrbHN6xG2BjoG8ySb9k"
