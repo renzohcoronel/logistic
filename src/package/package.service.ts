@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,7 +15,7 @@ export class PackageService {
 
   constructor(
     @InjectRepository(Package)
-    private readonly packageRespository: Repository<Package>,
+    private readonly packageRepository: Repository<Package>,
     private warehouseService: WarehouseService,
   ) {}
 
@@ -33,23 +30,26 @@ export class PackageService {
           packageDto.to,
         );
 
-        let newPackage = this.packageRespository.create();
+        let newPackage = new Package();
         newPackage.from = from;
         newPackage.customer = new Customer();
         newPackage.customer.id = customer.id;
         newPackage.to = to;
 
         newPackage.amount = nearbyWarehouse.distance / CONSTANTS.FACTOR_AMOUNT;
-        if (nearbyWarehouse.action === Action.ACCEPT_DELAYED){
-          newPackage.dateOfDelivery = moment(new Date()).add( nearbyWarehouse.duration, 'seconds').add(1 , 'days').toDate();
-        } else {
-          newPackage.dateOfDelivery = moment(new Date()).add( nearbyWarehouse.duration, 'seconds').toDate();
-        }
+
+        const dateOfDelivery = new Date();
+        newPackage.dateOfDelivery =
+          nearbyWarehouse.action === Action.ACCEPT_DELAYED
+            ? moment(dateOfDelivery)
+                .add(1, 'days')
+                .toDate()
+            : dateOfDelivery;
 
         newPackage.warehouse = nearbyWarehouse;
         newPackage.status = Status.RECEIVED;
 
-        newPackage = await this.packageRespository.save(newPackage);
+        newPackage = await this.packageRepository.save(newPackage);
 
         this.logger.log(`Package: ${newPackage.id}`);
 
@@ -58,7 +58,9 @@ export class PackageService {
         packageDto.warehouse.city = newPackage.warehouse.city;
         packageDto.warehouse.name = newPackage.warehouse.name;
         packageDto.amount = newPackage.amount;
-        packageDto.dateOfDelivery = moment(newPackage.dateOfDelivery).format('YYYY-MM-DD');
+        packageDto.dateOfDelivery = moment(newPackage.dateOfDelivery).format(
+          'YYYY-MM-DD',
+        );
         packageDto.status = newPackage.status;
 
         resolve(packageDto);

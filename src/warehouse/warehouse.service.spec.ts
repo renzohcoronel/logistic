@@ -95,7 +95,7 @@ describe('WarehouseService', async () => {
               city: 'Buenos Aires',
               maxLimit: 21,
               maxOccupied: 95,
-              action: Action.NARBY_NEXT_WAREHOUSE,
+              action: Action.NEARBY_NEXT_WAREHOUSE,
               packages: new Array<Package>(20),
             },
             {

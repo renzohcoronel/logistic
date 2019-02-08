@@ -60,7 +60,7 @@ export class WarehouseService {
             resolve(warehouse);
           } else if (warehouse.action === Action.ACCEPT_DELAYED) {
             resolve(warehouse);
-          } else if (warehouse.action === Action.NARBY_NEXT_WAREHOUSE) {
+          } else if (warehouse.action === Action.NEARBY_NEXT_WAREHOUSE) {
             /* the warehouse not accept more package. Search the next warehouse
              */
           } else {

@@ -4,7 +4,7 @@ import { Package } from './package.entity';
 export enum Action {
   ACCEPT = 'ACCEPT',
   ACCEPT_DELAYED = 'ACCEPT_DELAYED',
-  NARBY_NEXT_WAREHOUSE = 'NARBY_NEXT_WAREHOUSE',
+  NEARBY_NEXT_WAREHOUSE = 'NEARBY_NEXT_WAREHOUSE',
 }
 
 @Entity('wharehouse')

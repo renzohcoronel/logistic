@@ -2,7 +2,6 @@ import {
   Controller,
   HttpException,
   HttpStatus,
-  UseFilters,
   Put,
   Param,
   Query,
@@ -15,6 +14,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { WarehouseDTO } from './../dtos/warehouse.dto';
+import { Action } from './../models/warehouse.entity';
 
 @Controller('api')
 export class WarehouseController {
@@ -27,23 +27,23 @@ export class WarehouseController {
   })
   @ApiImplicitParam({ name: 'id', description: 'id of the warehouses' })
   @ApiImplicitQuery({
-    name: 'actionLimit',
-    enum: ['ACCEPT', 'ACCEPT_DELAYED', 'NARBY_NEXT_WAREHOUSE'],
+    name: 'action',
+    enum: Object.keys(Action),
   })
   @Put('warehouse/:id')
   async updateWarehouseActionLimit(@Param() params, @Query() query) {
     return new Promise<WarehouseDTO>((resolve, reject) =>
       this.serviceWarehouse
-        .changeWarehouseAction(params.id, query.actionLimit)
+        .changeWarehouseAction(params.id, query.action)
         .then(({id, city, name}) => {
-          const whDto = new WarehouseDTO();
-          whDto.id = id;
-          whDto.city = city;
-          whDto.name = name;
+          const warehouseDto = new WarehouseDTO();
+          warehouseDto.id = id;
+          warehouseDto.city = city;
+          warehouseDto.name = name;
 
-          this.logger.log(`Updated warehouse ${whDto.name}`);
+          this.logger.log(`Updated warehouse ${warehouseDto.name}`);
 
-          resolve(whDto);
+          resolve(warehouseDto);
         })
         .catch(e => {
           reject(

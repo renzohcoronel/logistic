@@ -39,7 +39,7 @@ describe('ValidationDTO', async () => {
       done();
     });
 
-    it('transform valid properties', async done => {
+    it('transform invalid properties', async done => {
       const value = {
         id: null,
         customer: {
